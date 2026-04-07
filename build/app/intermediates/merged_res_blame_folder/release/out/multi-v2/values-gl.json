@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.example.douyin_downloader.app-mergeReleaseResources-8:/values-gl/values-gl.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\FoxOS_User\\.gradle\\caches\\transforms-3\\d1887e3f230827c23c73d1567e91307e\\transformed\\core-1.6.0\\res\\values-gl\\values-gl.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "100",
+                        "endOffsets": "151"
+                    }
+                }
+            ]
+        }
+    ]
+}

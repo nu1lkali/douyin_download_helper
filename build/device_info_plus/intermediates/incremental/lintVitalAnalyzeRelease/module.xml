@@ -1,0 +1,26 @@
+<lint-module
+    format="1"
+    dir="C:\Users\FoxOS_User\AppData\Local\Pub\Cache\hosted\pub.dev\device_info_plus-9.1.2\android"
+    name=":device_info_plus"
+    type="LIBRARY"
+    maven="dev.fluttercommunity.plus.device_info:device_info_plus:"
+    agpVersion="8.2.0"
+    buildFolder="C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\device_info_plus"
+    bootClassPath="C:\Users\FoxOS_User\AppData\Local\Android\sdk\platforms\android-33\android.jar;C:\Users\FoxOS_User\AppData\Local\Android\sdk\build-tools\34.0.0\core-lambda-stubs.jar"
+    javaSourceLevel="1.8"
+    compileTarget="android-33"
+    neverShrinking="true">
+  <lintOptions
+      disable="InvalidPackage"
+      abortOnError="true"
+      absolutePaths="true"
+      checkReleaseBuilds="true"
+      explainIssues="true">
+    <severities>
+      <severity
+        id="InvalidPackage"
+        severity="IGNORE" />
+    </severities>
+  </lintOptions>
+  <variant name="release"/>
+</lint-module>

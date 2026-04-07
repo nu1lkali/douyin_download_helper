@@ -1,0 +1,5 @@
+R_DEF: Internal format may change without notice
+local
+drawable float_icon
+mipmap ic_launcher
+style AppTheme

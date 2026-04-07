@@ -1,0 +1,34 @@
+<lint-module
+    format="1"
+    dir="C:\Users\FoxOS_User\AppData\Local\Pub\Cache\hosted\pub.dev\path_provider_android-2.2.3\android"
+    name=":path_provider_android"
+    type="LIBRARY"
+    maven="io.flutter.plugins.pathprovider:path_provider_android:"
+    agpVersion="8.2.0"
+    buildFolder="C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\path_provider_android"
+    bootClassPath="C:\Users\FoxOS_User\AppData\Local\Android\sdk\platforms\android-34\android.jar;C:\Users\FoxOS_User\AppData\Local\Android\sdk\build-tools\34.0.0\core-lambda-stubs.jar"
+    javaSourceLevel="1.8"
+    compileTarget="android-34"
+    neverShrinking="true">
+  <lintOptions
+      disable="AndroidGradlePluginVersion,InvalidPackage,GradleDependency"
+      abortOnError="true"
+      absolutePaths="true"
+      checkAllWarnings="true"
+      warningsAsErrors="true"
+      checkReleaseBuilds="true"
+      explainIssues="true">
+    <severities>
+      <severity
+        id="AndroidGradlePluginVersion"
+        severity="IGNORE" />
+      <severity
+        id="GradleDependency"
+        severity="IGNORE" />
+      <severity
+        id="InvalidPackage"
+        severity="IGNORE" />
+    </severities>
+  </lintOptions>
+  <variant name="release"/>
+</lint-module>
