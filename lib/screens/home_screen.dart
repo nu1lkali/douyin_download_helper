@@ -302,6 +302,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       // 使用说明
                       _tipCard(),
+
+                      const SizedBox(height: 20),
+
+                      // 版权信息
+                      Center(
+                        child: Text(
+                          '© HACKFUN',
+                          style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                        ),
+                      ),
                     ],
                   ),
                 ),
