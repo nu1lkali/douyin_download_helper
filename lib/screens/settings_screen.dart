@@ -154,6 +154,13 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
             ],
           )),
 
+          // 远程模式时显示接口选择
+          if (_parseMode == ParseMode.remote) ...[
+            const SizedBox(height: 12),
+            _sectionLabel('远程接口'),
+            _card(child: _RemoteApiSelector(primary: _primary)),
+          ],
+
           const SizedBox(height: 20),
 
           // ── Cookie 配置（本地模式时高亮显示） ──
@@ -481,6 +488,85 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
     ),
     child: child,
   );
+}
+
+// 远程接口选择器
+class _RemoteApiSelector extends StatefulWidget {
+  final Color primary;
+  const _RemoteApiSelector({required this.primary});
+
+  @override
+  State<_RemoteApiSelector> createState() => _RemoteApiSelectorState();
+}
+
+class _RemoteApiSelectorState extends State<_RemoteApiSelector> {
+  RemoteApi _api = RemoteApi.hk0;
+
+  @override
+  void initState() {
+    super.initState();
+    SettingsService.getRemoteApi().then((v) => setState(() => _api = v));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _apiOption(
+          title: 'api.hk0.cc',
+          subtitle: '返回完整信息（封面、点赞数、音乐等）',
+          value: RemoteApi.hk0,
+        ),
+        const Divider(height: 1, indent: 16, endIndent: 16),
+        _apiOption(
+          title: 'api.xinyew.cn',
+          subtitle: '备用接口，字段较少（无封面、点赞数）',
+          value: RemoteApi.xinyew,
+        ),
+      ],
+    );
+  }
+
+  Widget _apiOption({required String title, required String subtitle, required RemoteApi value}) {
+    final selected = _api == value;
+    return InkWell(
+      onTap: () async {
+        await SettingsService.setRemoteApi(value);
+        setState(() => _api = value);
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: selected ? widget.primary : Colors.black87,
+                  )),
+                  const SizedBox(height: 2),
+                  Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                ],
+              ),
+            ),
+            Radio<RemoteApi>(
+              value: value,
+              groupValue: _api,
+              activeColor: widget.primary,
+              onChanged: (v) async {
+                if (v != null) {
+                  await SettingsService.setRemoteApi(v);
+                  setState(() => _api = v);
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 // 简洁模式下载后自动关闭开关

@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum ParseMode { remote, local }
+enum RemoteApi { hk0, xinyew }
 
 class SettingsService {
   static const _keyFloatingWindow = 'floating_window_enabled';
@@ -10,6 +11,7 @@ class SettingsService {
   static const _keyFloatingCompact = 'floating_compact_mode';
   static const _keyGroupByAuthor = 'group_by_author';
   static const _keyCompactAutoClose = 'compact_auto_close';
+  static const _keyRemoteApi = 'remote_api';
 
   static Future<bool> getFloatingWindowEnabled() async {
     final prefs = await SharedPreferences.getInstance();
@@ -80,5 +82,17 @@ class SettingsService {
   static Future<void> setCompactAutoClose(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyCompactAutoClose, value);
+  }
+
+  static Future<RemoteApi> getRemoteApi() async {
+    final prefs = await SharedPreferences.getInstance();
+    return (prefs.getString(_keyRemoteApi) ?? 'hk0') == 'xinyew'
+        ? RemoteApi.xinyew
+        : RemoteApi.hk0;
+  }
+
+  static Future<void> setRemoteApi(RemoteApi api) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyRemoteApi, api == RemoteApi.xinyew ? 'xinyew' : 'hk0');
   }
 }
