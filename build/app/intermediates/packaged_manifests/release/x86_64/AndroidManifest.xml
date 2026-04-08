@@ -21,6 +21,14 @@
     <!-- Android 12+ 剪贴板读取提示（无需权限，但建议声明） -->
     <uses-permission android:name="android.permission.READ_CLIPBOARD_IN_BACKGROUND" />
 
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.GET_CONTENT" />
+
+            <data android:mimeType="*/*" />
+        </intent>
+    </queries>
+
     <application
         android:name="android.app.Application"
         android:appComponentFactory="androidx.core.app.CoreComponentFactory"

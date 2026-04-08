@@ -110,6 +110,10 @@ file
 3.0
 file:///C:/Users/FoxOS_User/AppData/Local/Pub/Cache/hosted/pub.dev/file-7.0.1/
 file:///C:/Users/FoxOS_User/AppData/Local/Pub/Cache/hosted/pub.dev/file-7.0.1/lib/
+file_picker
+2.19
+file:///C:/Users/FoxOS_User/AppData/Local/Pub/Cache/hosted/pub.dev/file_picker-6.2.1/
+file:///C:/Users/FoxOS_User/AppData/Local/Pub/Cache/hosted/pub.dev/file_picker-6.2.1/lib/
 fixnum
 3.1
 file:///C:/Users/FoxOS_User/AppData/Local/Pub/Cache/hosted/pub.dev/fixnum-1.1.1/
@@ -118,6 +122,10 @@ flutter_lints
 3.1
 file:///C:/Users/FoxOS_User/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_lints-3.0.2/
 file:///C:/Users/FoxOS_User/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_lints-3.0.2/lib/
+flutter_plugin_android_lifecycle
+3.1
+file:///C:/Users/FoxOS_User/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.18/
+file:///C:/Users/FoxOS_User/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.18/lib/
 freezed
 2.17
 file:///C:/Users/FoxOS_User/AppData/Local/Pub/Cache/hosted/pub.dev/freezed-2.5.2/

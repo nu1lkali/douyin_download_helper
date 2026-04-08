@@ -1,6 +1,6 @@
 <dependencies>
   <compile
-      roots="__local_aars__:C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\app\intermediates\flutter\release\libs.jar:unspecified@jar,:@@:shared_preferences_android::release,:@@:permission_handler_android::release,:@@:device_info_plus::release,:@@:path_provider_android::release,io.flutter:flutter_embedding_release:1.0.0-767d8c75e898091b925519803830fc2721658d07@jar,androidx.window:window-java:1.0.0-beta04@aar,androidx.window:window:1.0.0-beta04@aar,org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2@jar,org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.2@jar,org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0@jar,io.flutter:armeabi_v7a_release:1.0.0-767d8c75e898091b925519803830fc2721658d07@jar,io.flutter:arm64_v8a_release:1.0.0-767d8c75e898091b925519803830fc2721658d07@jar,io.flutter:x86_64_release:1.0.0-767d8c75e898091b925519803830fc2721658d07@jar,androidx.lifecycle:lifecycle-common-java8:2.2.0@jar,androidx.fragment:fragment:1.1.0@aar,androidx.viewpager:viewpager:1.0.0@aar,androidx.loader:loader:1.0.0@aar,androidx.activity:activity:1.0.0@aar,androidx.customview:customview:1.0.0@aar,androidx.core:core:1.6.0@aar,androidx.core:core:1.6.0@aar,androidx.lifecycle:lifecycle-runtime:2.2.0@aar,androidx.savedstate:savedstate:1.0.0@aar,androidx.lifecycle:lifecycle-livedata:2.0.0@aar,androidx.lifecycle:lifecycle-livedata-core:2.0.0@aar,androidx.lifecycle:lifecycle-common:2.2.0@jar,androidx.arch.core:core-runtime:2.0.0@aar,androidx.arch.core:core-common:2.1.0@jar,androidx.versionedparcelable:versionedparcelable:1.1.1@aar,androidx.collection:collection:1.1.0@jar,androidx.lifecycle:lifecycle-viewmodel:2.1.0@aar,androidx.annotation:annotation-jvm:1.7.1@jar,org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0@jar,org.jetbrains.kotlin:kotlin-stdlib:1.9.0@jar,org.jetbrains.kotlin:kotlin-stdlib-common:1.9.0@jar,org.jetbrains:annotations:13.0@jar,androidx.annotation:annotation-experimental:1.1.0@aar,androidx.tracing:tracing:1.0.0@aar">
+      roots="__local_aars__:C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\app\intermediates\flutter\release\libs.jar:unspecified@jar,:@@:shared_preferences_android::release,:@@:permission_handler_android::release,:@@:flutter_plugin_android_lifecycle::release,:@@:file_picker::release,:@@:device_info_plus::release,:@@:path_provider_android::release,io.flutter:flutter_embedding_release:1.0.0-767d8c75e898091b925519803830fc2721658d07@jar,androidx.window:window-java:1.0.0-beta04@aar,androidx.window:window:1.0.0-beta04@aar,org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2@jar,org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.2@jar,org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0@jar,io.flutter:armeabi_v7a_release:1.0.0-767d8c75e898091b925519803830fc2721658d07@jar,io.flutter:arm64_v8a_release:1.0.0-767d8c75e898091b925519803830fc2721658d07@jar,io.flutter:x86_64_release:1.0.0-767d8c75e898091b925519803830fc2721658d07@jar,androidx.lifecycle:lifecycle-common-java8:2.2.0@jar,androidx.fragment:fragment:1.1.0@aar,androidx.viewpager:viewpager:1.0.0@aar,androidx.loader:loader:1.0.0@aar,androidx.activity:activity:1.0.0@aar,androidx.customview:customview:1.0.0@aar,androidx.core:core:1.6.0@aar,androidx.core:core:1.6.0@aar,androidx.lifecycle:lifecycle-runtime:2.2.0@aar,androidx.savedstate:savedstate:1.0.0@aar,androidx.lifecycle:lifecycle-livedata:2.0.0@aar,androidx.lifecycle:lifecycle-livedata-core:2.0.0@aar,androidx.lifecycle:lifecycle-common:2.2.0@jar,androidx.arch.core:core-runtime:2.0.0@aar,androidx.arch.core:core-common:2.1.0@jar,androidx.versionedparcelable:versionedparcelable:1.1.1@aar,androidx.collection:collection:1.1.0@jar,androidx.lifecycle:lifecycle-viewmodel:2.1.0@aar,androidx.annotation:annotation-jvm:1.7.1@jar,org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0@jar,org.jetbrains.kotlin:kotlin-stdlib:1.9.0@jar,org.jetbrains.kotlin:kotlin-stdlib-common:1.9.0@jar,org.jetbrains:annotations:13.0@jar,androidx.annotation:annotation-experimental:1.1.0@aar,androidx.tracing:tracing:1.0.0@aar">
     <dependency
         name="__local_aars__:C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\app\intermediates\flutter\release\libs.jar:unspecified@jar"
         simpleName="__local_aars__:C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\app\intermediates\flutter\release\libs.jar"/>
@@ -10,6 +10,12 @@
     <dependency
         name=":@@:permission_handler_android::release"
         simpleName="com.baseflow.permissionhandler:permission_handler_android"/>
+    <dependency
+        name=":@@:flutter_plugin_android_lifecycle::release"
+        simpleName="io.flutter.plugins.flutter_plugin_android_lifecycle:flutter_plugin_android_lifecycle"/>
+    <dependency
+        name=":@@:file_picker::release"
+        simpleName="com.mr.flutter.plugin.filepicker:file_picker"/>
     <dependency
         name=":@@:device_info_plus::release"
         simpleName="dev.fluttercommunity.plus.device_info:device_info_plus"/>
@@ -117,7 +123,7 @@
         simpleName="androidx.tracing:tracing"/>
   </compile>
   <package
-      roots="__local_aars__:C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\app\intermediates\flutter\release\libs.jar:unspecified@jar,:@@:shared_preferences_android::release,:@@:permission_handler_android::release,:@@:device_info_plus::release,:@@:path_provider_android::release,io.flutter:flutter_embedding_release:1.0.0-767d8c75e898091b925519803830fc2721658d07@jar,androidx.window:window-java:1.0.0-beta04@aar,androidx.window:window:1.0.0-beta04@aar,org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2@jar,org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.2@jar,org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0@jar,io.flutter:armeabi_v7a_release:1.0.0-767d8c75e898091b925519803830fc2721658d07@jar,io.flutter:arm64_v8a_release:1.0.0-767d8c75e898091b925519803830fc2721658d07@jar,io.flutter:x86_64_release:1.0.0-767d8c75e898091b925519803830fc2721658d07@jar,org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0@jar,androidx.lifecycle:lifecycle-common-java8:2.2.0@jar,androidx.fragment:fragment:1.1.0@aar,androidx.viewpager:viewpager:1.0.0@aar,androidx.loader:loader:1.0.0@aar,androidx.activity:activity:1.0.0@aar,androidx.customview:customview:1.0.0@aar,androidx.core:core:1.6.0@aar,androidx.core:core:1.6.0@aar,androidx.lifecycle:lifecycle-runtime:2.2.0@aar,androidx.savedstate:savedstate:1.0.0@aar,androidx.lifecycle:lifecycle-livedata:2.0.0@aar,androidx.lifecycle:lifecycle-livedata-core:2.0.0@aar,androidx.lifecycle:lifecycle-common:2.2.0@jar,androidx.tracing:tracing:1.0.0@aar,androidx.arch.core:core-runtime:2.0.0@aar,androidx.arch.core:core-common:2.1.0@jar,androidx.versionedparcelable:versionedparcelable:1.1.1@aar,androidx.collection:collection:1.1.0@jar,androidx.lifecycle:lifecycle-viewmodel:2.1.0@aar,androidx.annotation:annotation-jvm:1.7.1@jar,org.jetbrains.kotlin:kotlin-stdlib:1.9.0@jar,org.jetbrains.kotlin:kotlin-stdlib-common:1.9.0@jar,org.jetbrains:annotations:13.0@jar,androidx.annotation:annotation-experimental:1.1.0@aar">
+      roots="__local_aars__:C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\app\intermediates\flutter\release\libs.jar:unspecified@jar,:@@:shared_preferences_android::release,:@@:permission_handler_android::release,:@@:file_picker::release,:@@:flutter_plugin_android_lifecycle::release,:@@:device_info_plus::release,:@@:path_provider_android::release,io.flutter:flutter_embedding_release:1.0.0-767d8c75e898091b925519803830fc2721658d07@jar,androidx.window:window-java:1.0.0-beta04@aar,androidx.window:window:1.0.0-beta04@aar,org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2@jar,org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.2@jar,org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0@jar,io.flutter:armeabi_v7a_release:1.0.0-767d8c75e898091b925519803830fc2721658d07@jar,io.flutter:arm64_v8a_release:1.0.0-767d8c75e898091b925519803830fc2721658d07@jar,io.flutter:x86_64_release:1.0.0-767d8c75e898091b925519803830fc2721658d07@jar,androidx.fragment:fragment:1.1.0@aar,androidx.viewpager:viewpager:1.0.0@aar,androidx.loader:loader:1.0.0@aar,androidx.activity:activity:1.0.0@aar,androidx.customview:customview:1.0.0@aar,androidx.core:core:1.6.0@aar,androidx.core:core:1.6.0@aar,androidx.lifecycle:lifecycle-runtime:2.2.0@aar,androidx.lifecycle:lifecycle-common-java8:2.2.0@jar,androidx.savedstate:savedstate:1.0.0@aar,androidx.lifecycle:lifecycle-livedata:2.0.0@aar,androidx.lifecycle:lifecycle-livedata-core:2.0.0@aar,androidx.lifecycle:lifecycle-common:2.2.0@jar,androidx.tracing:tracing:1.0.0@aar,androidx.arch.core:core-runtime:2.0.0@aar,androidx.arch.core:core-common:2.1.0@jar,androidx.versionedparcelable:versionedparcelable:1.1.1@aar,androidx.collection:collection:1.1.0@jar,androidx.lifecycle:lifecycle-viewmodel:2.1.0@aar,org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0@jar,androidx.annotation:annotation-jvm:1.7.1@jar,org.jetbrains.kotlin:kotlin-stdlib:1.9.0@jar,org.jetbrains.kotlin:kotlin-stdlib-common:1.9.0@jar,org.jetbrains:annotations:13.0@jar,androidx.annotation:annotation-experimental:1.1.0@aar">
     <dependency
         name="__local_aars__:C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\app\intermediates\flutter\release\libs.jar:unspecified@jar"
         simpleName="__local_aars__:C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\app\intermediates\flutter\release\libs.jar"/>
@@ -127,6 +133,12 @@
     <dependency
         name=":@@:permission_handler_android::release"
         simpleName="com.baseflow.permissionhandler:permission_handler_android"/>
+    <dependency
+        name=":@@:file_picker::release"
+        simpleName="com.mr.flutter.plugin.filepicker:file_picker"/>
+    <dependency
+        name=":@@:flutter_plugin_android_lifecycle::release"
+        simpleName="io.flutter.plugins.flutter_plugin_android_lifecycle:flutter_plugin_android_lifecycle"/>
     <dependency
         name=":@@:device_info_plus::release"
         simpleName="dev.fluttercommunity.plus.device_info:device_info_plus"/>
@@ -161,12 +173,6 @@
         name="io.flutter:x86_64_release:1.0.0-767d8c75e898091b925519803830fc2721658d07@jar"
         simpleName="io.flutter:x86_64_release"/>
     <dependency
-        name="org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0@jar"
-        simpleName="org.jetbrains.kotlin:kotlin-stdlib-jdk7"/>
-    <dependency
-        name="androidx.lifecycle:lifecycle-common-java8:2.2.0@jar"
-        simpleName="androidx.lifecycle:lifecycle-common-java8"/>
-    <dependency
         name="androidx.fragment:fragment:1.1.0@aar"
         simpleName="androidx.fragment:fragment"/>
     <dependency
@@ -187,6 +193,9 @@
     <dependency
         name="androidx.lifecycle:lifecycle-runtime:2.2.0@aar"
         simpleName="androidx.lifecycle:lifecycle-runtime"/>
+    <dependency
+        name="androidx.lifecycle:lifecycle-common-java8:2.2.0@jar"
+        simpleName="androidx.lifecycle:lifecycle-common-java8"/>
     <dependency
         name="androidx.savedstate:savedstate:1.0.0@aar"
         simpleName="androidx.savedstate:savedstate"/>
@@ -217,6 +226,9 @@
     <dependency
         name="androidx.lifecycle:lifecycle-viewmodel:2.1.0@aar"
         simpleName="androidx.lifecycle:lifecycle-viewmodel"/>
+    <dependency
+        name="org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0@jar"
+        simpleName="org.jetbrains.kotlin:kotlin-stdlib-jdk7"/>
     <dependency
         name="androidx.annotation:annotation-jvm:1.7.1@jar"
         simpleName="androidx.annotation:annotation-jvm"/>

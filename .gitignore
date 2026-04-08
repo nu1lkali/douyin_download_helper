@@ -1,0 +1,67 @@
+# ── Flutter / Dart ──
+**/.dart_tool/
+.dart_tool/
+**/.flutter-plugins
+.flutter-plugins
+**/.flutter-plugins-dependencies
+.flutter-plugins-dependencies
+.packages
+pubspec.lock
+**/build/
+build/
+**/*.g.dart
+**/*.freezed.dart
+
+# ── Android ──
+android/.gradle/
+**/android/.gradle/
+android/local.properties
+android/key.properties
+android/app/debug.keystore
+android/app/release.keystore
+android/app/*.jks
+android/app/*.keystore
+android/captures/
+android/gradlew
+android/gradlew.bat
+android/gradle/wrapper/gradle-wrapper.jar
+*.apk
+*.aab
+
+# ── IDE ──
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.DS_Store
+Thumbs.db
+
+# ── 敏感配置 ──
+Douyin_TikTok_Download_API/crawlers/douyin/web/config.yaml
+cookie.txt
+
+# ── Python ──
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+*.log
+
+# ── 临时文件 ──
+*.tmp
+*.bak
+*.swp
+*.orig
+/.dart_tool
+/.dart_tool
+/.dart_tool
+/.dart_tool/build/fcd1995bc647fb959e82ea360c6c2c9a
+/.dart_tool

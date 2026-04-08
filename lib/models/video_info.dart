@@ -47,7 +47,7 @@ class MusicInfo with _$MusicInfo {
   const factory MusicInfo({
     @Default('') String title,
     @Default('') String author,
-    @Default('') String avatar,
+    @JsonKey(fromJson: _parseNullableString) @Default('') String avatar,
     @Default('') String url,
   }) = _MusicInfo;
 
@@ -57,6 +57,12 @@ class MusicInfo with _$MusicInfo {
 
 // uid 可能是 int 或 String
 String _parseId(dynamic value) {
+  if (value == null) return '';
+  return value.toString();
+}
+
+// nullable String 字段
+String _parseNullableString(dynamic value) {
   if (value == null) return '';
   return value.toString();
 }

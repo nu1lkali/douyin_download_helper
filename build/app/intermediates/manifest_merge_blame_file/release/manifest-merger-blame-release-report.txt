@@ -37,72 +37,86 @@
 22-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:12:5-13:47
 22-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:12:22-84
 23
-24    <application
-25        android:name="android.app.Application"
-25-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:17:9-42
-26        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-26-->[androidx.core:core:1.6.0] C:\Users\FoxOS_User\.gradle\caches\transforms-3\d1887e3f230827c23c73d1567e91307e\transformed\core-1.6.0\AndroidManifest.xml:24:18-86
-27        android:extractNativeLibs="true"
-28        android:icon="@mipmap/ic_launcher"
-28-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:18:9-43
-29        android:label="便捷下载"
-29-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:16:9-29
-30        android:roundIcon="@mipmap/ic_launcher" >
-30-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:19:9-48
-31        <activity
-31-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:20:9-32:20
-32            android:name="com.example.douyin_downloader.MainActivity"
-32-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:21:13-41
-33            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
-33-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:25:13-163
-34            android:exported="true"
-34-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:22:13-36
-35            android:hardwareAccelerated="true"
-35-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:26:13-47
-36            android:launchMode="singleTop"
-36-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:23:13-43
-37            android:theme="@style/AppTheme"
-37-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:24:13-44
-38            android:windowSoftInputMode="adjustResize" >
-38-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:27:13-55
-39            <intent-filter>
-39-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:28:13-31:29
-40                <action android:name="android.intent.action.MAIN" />
-40-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:29:17-68
-40-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:29:25-66
-41
-42                <category android:name="android.intent.category.LAUNCHER" />
-42-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:30:17-76
-42-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:30:27-74
-43            </intent-filter>
-44        </activity>
-45
-46        <meta-data
-46-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:33:9-35:33
-47            android:name="flutterEmbedding"
-47-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:34:13-44
-48            android:value="2" />
-48-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:35:13-30
+24    <queries>
+24-->[:file_picker] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:11:5-17:15
+25        <intent>
+25-->[:file_picker] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:12:9-16:18
+26            <action android:name="android.intent.action.GET_CONTENT" />
+26-->[:file_picker] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:13:13-72
+26-->[:file_picker] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:13:21-69
+27
+28            <data android:mimeType="*/*" />
+28-->[:file_picker] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:15:13-44
+28-->[:file_picker] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:15:19-41
+29        </intent>
+30    </queries>
+31
+32    <application
+33        android:name="android.app.Application"
+33-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:17:9-42
+34        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+34-->[androidx.core:core:1.6.0] C:\Users\FoxOS_User\.gradle\caches\transforms-3\d1887e3f230827c23c73d1567e91307e\transformed\core-1.6.0\AndroidManifest.xml:24:18-86
+35        android:extractNativeLibs="true"
+36        android:icon="@mipmap/ic_launcher"
+36-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:18:9-43
+37        android:label="便捷下载"
+37-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:16:9-29
+38        android:roundIcon="@mipmap/ic_launcher" >
+38-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:19:9-48
+39        <activity
+39-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:20:9-32:20
+40            android:name="com.example.douyin_downloader.MainActivity"
+40-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:21:13-41
+41            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+41-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:25:13-163
+42            android:exported="true"
+42-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:22:13-36
+43            android:hardwareAccelerated="true"
+43-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:26:13-47
+44            android:launchMode="singleTop"
+44-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:23:13-43
+45            android:theme="@style/AppTheme"
+45-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:24:13-44
+46            android:windowSoftInputMode="adjustResize" >
+46-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:27:13-55
+47            <intent-filter>
+47-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:28:13-31:29
+48                <action android:name="android.intent.action.MAIN" />
+48-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:29:17-68
+48-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:29:25-66
 49
-50        <service
-50-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:37:9-39:40
-51            android:name="com.example.douyin_downloader.FloatingWindowService"
-51-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:38:13-50
-52            android:exported="false" />
-52-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:39:13-37
+50                <category android:name="android.intent.category.LAUNCHER" />
+50-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:30:17-76
+50-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:30:27-74
+51            </intent-filter>
+52        </activity>
 53
-54        <uses-library
-54-->[androidx.window:window:1.0.0-beta04] C:\Users\FoxOS_User\.gradle\caches\transforms-3\80b14857962532d89cdbcd854764be1d\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:25:9-27:40
-55            android:name="androidx.window.extensions"
-55-->[androidx.window:window:1.0.0-beta04] C:\Users\FoxOS_User\.gradle\caches\transforms-3\80b14857962532d89cdbcd854764be1d\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:26:13-54
-56            android:required="false" />
-56-->[androidx.window:window:1.0.0-beta04] C:\Users\FoxOS_User\.gradle\caches\transforms-3\80b14857962532d89cdbcd854764be1d\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:27:13-37
-57        <uses-library
-57-->[androidx.window:window:1.0.0-beta04] C:\Users\FoxOS_User\.gradle\caches\transforms-3\80b14857962532d89cdbcd854764be1d\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:28:9-30:40
-58            android:name="androidx.window.sidecar"
-58-->[androidx.window:window:1.0.0-beta04] C:\Users\FoxOS_User\.gradle\caches\transforms-3\80b14857962532d89cdbcd854764be1d\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:29:13-51
-59            android:required="false" />
-59-->[androidx.window:window:1.0.0-beta04] C:\Users\FoxOS_User\.gradle\caches\transforms-3\80b14857962532d89cdbcd854764be1d\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:30:13-37
-60    </application>
+54        <meta-data
+54-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:33:9-35:33
+55            android:name="flutterEmbedding"
+55-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:34:13-44
+56            android:value="2" />
+56-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:35:13-30
+57
+58        <service
+58-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:37:9-39:40
+59            android:name="com.example.douyin_downloader.FloatingWindowService"
+59-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:38:13-50
+60            android:exported="false" />
+60-->C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:39:13-37
 61
-62</manifest>
+62        <uses-library
+62-->[androidx.window:window:1.0.0-beta04] C:\Users\FoxOS_User\.gradle\caches\transforms-3\80b14857962532d89cdbcd854764be1d\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:25:9-27:40
+63            android:name="androidx.window.extensions"
+63-->[androidx.window:window:1.0.0-beta04] C:\Users\FoxOS_User\.gradle\caches\transforms-3\80b14857962532d89cdbcd854764be1d\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:26:13-54
+64            android:required="false" />
+64-->[androidx.window:window:1.0.0-beta04] C:\Users\FoxOS_User\.gradle\caches\transforms-3\80b14857962532d89cdbcd854764be1d\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:27:13-37
+65        <uses-library
+65-->[androidx.window:window:1.0.0-beta04] C:\Users\FoxOS_User\.gradle\caches\transforms-3\80b14857962532d89cdbcd854764be1d\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:28:9-30:40
+66            android:name="androidx.window.sidecar"
+66-->[androidx.window:window:1.0.0-beta04] C:\Users\FoxOS_User\.gradle\caches\transforms-3\80b14857962532d89cdbcd854764be1d\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:29:13-51
+67            android:required="false" />
+67-->[androidx.window:window:1.0.0-beta04] C:\Users\FoxOS_User\.gradle\caches\transforms-3\80b14857962532d89cdbcd854764be1d\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:30:13-37
+68    </application>
+69
+70</manifest>

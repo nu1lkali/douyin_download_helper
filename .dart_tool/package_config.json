@@ -170,6 +170,12 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "file_picker",
+      "rootUri": "file:///C:/Users/FoxOS_User/AppData/Local/Pub/Cache/hosted/pub.dev/file_picker-6.2.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
       "name": "fixnum",
       "rootUri": "file:///C:/Users/FoxOS_User/AppData/Local/Pub/Cache/hosted/pub.dev/fixnum-1.1.1",
       "packageUri": "lib/",
@@ -184,6 +190,12 @@
     {
       "name": "flutter_lints",
       "rootUri": "file:///C:/Users/FoxOS_User/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_lints-3.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.1"
+    },
+    {
+      "name": "flutter_plugin_android_lifecycle",
+      "rootUri": "file:///C:/Users/FoxOS_User/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.18",
       "packageUri": "lib/",
       "languageVersion": "3.1"
     },
@@ -596,7 +608,7 @@
       "languageVersion": "3.0"
     }
   ],
-  "generated": "2026-04-07T13:49:57.834404Z",
+  "generated": "2026-04-08T00:31:24.951783Z",
   "generator": "pub",
   "generatorVersion": "3.1.4"
 }

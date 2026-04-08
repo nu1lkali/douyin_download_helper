@@ -40,7 +40,8 @@ _$MusicInfoImpl _$$MusicInfoImplFromJson(Map<String, dynamic> json) =>
     _$MusicInfoImpl(
       title: json['title'] as String? ?? '',
       author: json['author'] as String? ?? '',
-      avatar: json['avatar'] as String? ?? '',
+      avatar:
+          json['avatar'] == null ? '' : _parseNullableString(json['avatar']),
       url: json['url'] as String? ?? '',
     );
 

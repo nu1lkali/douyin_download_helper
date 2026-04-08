@@ -28,6 +28,8 @@ INJECTED from C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android
 INJECTED from C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:1:1-41:12
 MERGED from [:shared_preferences_android] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\shared_preferences_android\intermediates\merged_manifest\release\AndroidManifest.xml:2:1-7:12
 MERGED from [:permission_handler_android] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\permission_handler_android\intermediates\merged_manifest\release\AndroidManifest.xml:2:1-7:12
+MERGED from [:file_picker] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:2:1-19:12
+MERGED from [:flutter_plugin_android_lifecycle] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\flutter_plugin_android_lifecycle\intermediates\merged_manifest\release\AndroidManifest.xml:2:1-7:12
 MERGED from [:device_info_plus] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\device_info_plus\intermediates\merged_manifest\release\AndroidManifest.xml:2:1-7:12
 MERGED from [:path_provider_android] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\path_provider_android\intermediates\merged_manifest\release\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.window:window-java:1.0.0-beta04] C:\Users\FoxOS_User\.gradle\caches\transforms-3\05457a71916835183c5ab5fcca5a598b\transformed\jetified-window-java-1.0.0-beta04\AndroidManifest.xml:17:1-23:12
@@ -69,6 +71,8 @@ ADDED from C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\ap
 		ADDED from C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:4:22-78
 uses-permission#android.permission.READ_EXTERNAL_STORAGE
 ADDED from C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:6:5-7:38
+MERGED from [:file_picker] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:7:5-9:38
+MERGED from [:file_picker] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:7:5-9:38
 	android:maxSdkVersion
 		ADDED from C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml:7:9-35
 	android:name
@@ -137,6 +141,10 @@ MERGED from [:shared_preferences_android] C:\Users\FoxOS_User\Desktop\project\do
 MERGED from [:shared_preferences_android] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\shared_preferences_android\intermediates\merged_manifest\release\AndroidManifest.xml:5:5-44
 MERGED from [:permission_handler_android] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\permission_handler_android\intermediates\merged_manifest\release\AndroidManifest.xml:5:5-44
 MERGED from [:permission_handler_android] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\permission_handler_android\intermediates\merged_manifest\release\AndroidManifest.xml:5:5-44
+MERGED from [:file_picker] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:5:5-44
+MERGED from [:file_picker] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:5:5-44
+MERGED from [:flutter_plugin_android_lifecycle] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\flutter_plugin_android_lifecycle\intermediates\merged_manifest\release\AndroidManifest.xml:5:5-44
+MERGED from [:flutter_plugin_android_lifecycle] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\flutter_plugin_android_lifecycle\intermediates\merged_manifest\release\AndroidManifest.xml:5:5-44
 MERGED from [:device_info_plus] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\device_info_plus\intermediates\merged_manifest\release\AndroidManifest.xml:5:5-44
 MERGED from [:device_info_plus] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\device_info_plus\intermediates\merged_manifest\release\AndroidManifest.xml:5:5-44
 MERGED from [:path_provider_android] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\path_provider_android\intermediates\merged_manifest\release\AndroidManifest.xml:5:5-44
@@ -179,6 +187,18 @@ MERGED from [androidx.annotation:annotation-experimental:1.1.0] C:\Users\FoxOS_U
 		INJECTED from C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml
 	android:minSdkVersion
 		INJECTED from C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\android\app\src\main\AndroidManifest.xml
+queries
+ADDED from [:file_picker] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:11:5-17:15
+intent#action:name:android.intent.action.GET_CONTENT+data:mimeType:*/*
+ADDED from [:file_picker] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:12:9-16:18
+action#android.intent.action.GET_CONTENT
+ADDED from [:file_picker] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:13:13-72
+	android:name
+		ADDED from [:file_picker] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:13:21-69
+data
+ADDED from [:file_picker] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:15:13-44
+	android:mimeType
+		ADDED from [:file_picker] C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\file_picker\intermediates\merged_manifest\release\AndroidManifest.xml:15:19-41
 uses-library#androidx.window.extensions
 ADDED from [androidx.window:window:1.0.0-beta04] C:\Users\FoxOS_User\.gradle\caches\transforms-3\80b14857962532d89cdbcd854764be1d\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:25:9-27:40
 	android:required

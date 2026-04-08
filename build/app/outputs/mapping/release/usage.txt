@@ -10,38 +10,46 @@ android.support.v4.os.ResultReceiver$1
 android.support.v4.os.ResultReceiver$MyResultReceiver
 android.support.v4.os.ResultReceiver$MyRunnable
 android.support.v4.os.ResultReceiver
-androidx.activity.Cancellable
 androidx.activity.ComponentActivity$1
 androidx.activity.ComponentActivity$2:
-    final synthetic androidx.activity.ComponentActivity this$0
     void <init>(androidx.activity.ComponentActivity)
-    public void onStateChanged(androidx.lifecycle.LifecycleOwner,androidx.lifecycle.Lifecycle$Event)
 androidx.activity.ComponentActivity$3:
-    final synthetic androidx.activity.ComponentActivity this$0
     void <init>(androidx.activity.ComponentActivity)
-    public void onStateChanged(androidx.lifecycle.LifecycleOwner,androidx.lifecycle.Lifecycle$Event)
 androidx.activity.ComponentActivity$NonConfigurationInstances
-androidx.activity.ComponentActivity
+androidx.activity.ComponentActivity:
+    private int mContentLayoutId
+    private final androidx.lifecycle.LifecycleRegistry mLifecycleRegistry
+    private final androidx.activity.OnBackPressedDispatcher mOnBackPressedDispatcher
+    private final androidx.savedstate.SavedStateRegistryController mSavedStateRegistryController
+    private androidx.lifecycle.ViewModelStore mViewModelStore
+    public void <init>()
+    public void <init>(int)
+    static synthetic void access$001(androidx.activity.ComponentActivity)
+    public java.lang.Object getLastCustomNonConfigurationInstance()
+    public androidx.lifecycle.Lifecycle getLifecycle()
+    public final androidx.activity.OnBackPressedDispatcher getOnBackPressedDispatcher()
+    public final androidx.savedstate.SavedStateRegistry getSavedStateRegistry()
+    public void onBackPressed()
+    protected void onCreate(android.os.Bundle)
+    public java.lang.Object onRetainCustomNonConfigurationInstance()
+    public final java.lang.Object onRetainNonConfigurationInstance()
+    protected void onSaveInstanceState(android.os.Bundle)
 androidx.activity.ImmLeaksCleaner:
     private static final int INIT_FAILED
     private static final int INIT_SUCCESS
     private static final int NOT_INITIALIAZED
-    private android.app.Activity mActivity
-    private static java.lang.reflect.Field sHField
-    private static java.lang.reflect.Field sNextServedViewField
-    private static java.lang.reflect.Field sServedViewField
     void <init>(android.app.Activity)
-    private static void initializeReflectiveFields()
-    public void onStateChanged(androidx.lifecycle.LifecycleOwner,androidx.lifecycle.Lifecycle$Event)
-androidx.activity.OnBackPressedCallback
+androidx.activity.OnBackPressedCallback:
+    private java.util.concurrent.CopyOnWriteArrayList mCancellables
+    private boolean mEnabled
+    public void <init>(boolean)
+    void addCancellable(androidx.activity.Cancellable)
+    public abstract void handleOnBackPressed()
+    public final boolean isEnabled()
+    public final void remove()
+    public final void setEnabled(boolean)
 androidx.activity.OnBackPressedDispatcher$LifecycleOnBackPressedCancellable:
-    private androidx.activity.Cancellable mCurrentCancellable
-    private final androidx.lifecycle.Lifecycle mLifecycle
-    private final androidx.activity.OnBackPressedCallback mOnBackPressedCallback
-    final synthetic androidx.activity.OnBackPressedDispatcher this$0
     void <init>(androidx.activity.OnBackPressedDispatcher,androidx.lifecycle.Lifecycle,androidx.activity.OnBackPressedCallback)
-    public void cancel()
-    public void onStateChanged(androidx.lifecycle.LifecycleOwner,androidx.lifecycle.Lifecycle$Event)
 androidx.activity.OnBackPressedDispatcher$OnBackPressedCancellable
 androidx.activity.OnBackPressedDispatcher:
     private final java.lang.Runnable mFallbackOnBackPressed
@@ -50,7 +58,6 @@ androidx.activity.OnBackPressedDispatcher:
     public void <init>(java.lang.Runnable)
     public void addCallback(androidx.activity.OnBackPressedCallback)
     public void addCallback(androidx.lifecycle.LifecycleOwner,androidx.activity.OnBackPressedCallback)
-    androidx.activity.Cancellable addCancellableCallback(androidx.activity.OnBackPressedCallback)
     public boolean hasEnabledCallbacks()
 androidx.activity.R$attr
 androidx.activity.R$color
@@ -150,36 +157,8 @@ androidx.arch.core.executor.ArchTaskExecutor
 androidx.arch.core.executor.DefaultTaskExecutor$1
 androidx.arch.core.executor.DefaultTaskExecutor
 androidx.arch.core.executor.TaskExecutor
-androidx.arch.core.internal.FastSafeIterableMap:
-    public java.util.Map$Entry ceil(java.lang.Object)
-    protected androidx.arch.core.internal.SafeIterableMap$Entry get(java.lang.Object)
-    public java.lang.Object putIfAbsent(java.lang.Object,java.lang.Object)
-    public java.lang.Object remove(java.lang.Object)
-androidx.arch.core.internal.SafeIterableMap$AscendingIterator:
-    androidx.arch.core.internal.SafeIterableMap$Entry backward(androidx.arch.core.internal.SafeIterableMap$Entry)
-androidx.arch.core.internal.SafeIterableMap$DescendingIterator:
-    androidx.arch.core.internal.SafeIterableMap$Entry backward(androidx.arch.core.internal.SafeIterableMap$Entry)
-androidx.arch.core.internal.SafeIterableMap$Entry:
-    final java.lang.Object mKey
-    final java.lang.Object mValue
-    void <init>(java.lang.Object,java.lang.Object)
-    public boolean equals(java.lang.Object)
-    public java.lang.Object getKey()
-    public java.lang.Object getValue()
-    public int hashCode()
-    public java.lang.Object setValue(java.lang.Object)
-    public java.lang.String toString()
-androidx.arch.core.internal.SafeIterableMap$IteratorWithAdditions:
-    public void supportRemove(androidx.arch.core.internal.SafeIterableMap$Entry)
-androidx.arch.core.internal.SafeIterableMap$ListIterator:
-    abstract androidx.arch.core.internal.SafeIterableMap$Entry backward(androidx.arch.core.internal.SafeIterableMap$Entry)
-    public void supportRemove(androidx.arch.core.internal.SafeIterableMap$Entry)
-androidx.arch.core.internal.SafeIterableMap$SupportRemove
 androidx.arch.core.internal.SafeIterableMap:
-    protected androidx.arch.core.internal.SafeIterableMap$Entry get(java.lang.Object)
-    protected androidx.arch.core.internal.SafeIterableMap$Entry put(java.lang.Object,java.lang.Object)
     public java.lang.Object putIfAbsent(java.lang.Object,java.lang.Object)
-    public java.lang.Object remove(java.lang.Object)
 androidx.arch.core.util.Function
 androidx.collection.ArrayMap:
     public void <init>(int)
@@ -300,7 +279,18 @@ androidx.core.app.AppOpsManagerCompat
 androidx.core.app.BundleCompat$BundleCompatBaseImpl
 androidx.core.app.BundleCompat
 androidx.core.app.ComponentActivity$ExtraData
-androidx.core.app.ComponentActivity
+androidx.core.app.ComponentActivity:
+    private androidx.collection.SimpleArrayMap mExtraDataMap
+    private androidx.lifecycle.LifecycleRegistry mLifecycleRegistry
+    public void <init>()
+    public boolean dispatchKeyEvent(android.view.KeyEvent)
+    public boolean dispatchKeyShortcutEvent(android.view.KeyEvent)
+    public androidx.core.app.ComponentActivity$ExtraData getExtraData(java.lang.Class)
+    public androidx.lifecycle.Lifecycle getLifecycle()
+    protected void onCreate(android.os.Bundle)
+    protected void onSaveInstanceState(android.os.Bundle)
+    public void putExtraData(androidx.core.app.ComponentActivity$ExtraData)
+    public boolean superDispatchKeyEvent(android.view.KeyEvent)
 androidx.core.app.DialogCompat
 androidx.core.app.FrameMetricsAggregator$FrameMetricsApi24Impl$1
 androidx.core.app.FrameMetricsAggregator$FrameMetricsApi24Impl
@@ -1457,9 +1447,7 @@ androidx.fragment.app.DialogFragment$1
 androidx.fragment.app.DialogFragment
 androidx.fragment.app.Fragment$1
 androidx.fragment.app.Fragment$2:
-    final synthetic androidx.fragment.app.Fragment this$0
     void <init>(androidx.fragment.app.Fragment)
-    public void onStateChanged(androidx.lifecycle.LifecycleOwner,androidx.lifecycle.Lifecycle$Event)
 androidx.fragment.app.Fragment$3
 androidx.fragment.app.Fragment$4
 androidx.fragment.app.Fragment$AnimationInfo
@@ -1467,7 +1455,235 @@ androidx.fragment.app.Fragment$InstantiationException
 androidx.fragment.app.Fragment$OnStartEnterTransitionListener
 androidx.fragment.app.Fragment$SavedState$1
 androidx.fragment.app.Fragment$SavedState
-androidx.fragment.app.Fragment
+androidx.fragment.app.Fragment:
+    static final int ACTIVITY_CREATED
+    static final int CREATED
+    static final int INITIALIZING
+    static final int RESUMED
+    static final int STARTED
+    static final java.lang.Object USE_DEFAULT_TRANSITION
+    boolean mAdded
+    androidx.fragment.app.Fragment$AnimationInfo mAnimationInfo
+    android.os.Bundle mArguments
+    int mBackStackNesting
+    private boolean mCalled
+    androidx.fragment.app.FragmentManagerImpl mChildFragmentManager
+    android.view.ViewGroup mContainer
+    int mContainerId
+    private int mContentLayoutId
+    boolean mDeferStart
+    boolean mDetached
+    int mFragmentId
+    androidx.fragment.app.FragmentManagerImpl mFragmentManager
+    boolean mFromLayout
+    boolean mHasMenu
+    boolean mHidden
+    boolean mHiddenChanged
+    androidx.fragment.app.FragmentHostCallback mHost
+    boolean mInLayout
+    android.view.View mInnerView
+    boolean mIsCreated
+    boolean mIsNewlyAdded
+    private java.lang.Boolean mIsPrimaryNavigationFragment
+    android.view.LayoutInflater mLayoutInflater
+    androidx.lifecycle.LifecycleRegistry mLifecycleRegistry
+    androidx.lifecycle.Lifecycle$State mMaxState
+    boolean mMenuVisible
+    androidx.fragment.app.Fragment mParentFragment
+    boolean mPerformedCreateView
+    float mPostponedAlpha
+    java.lang.Runnable mPostponedDurationRunnable
+    boolean mRemoving
+    boolean mRestored
+    boolean mRetainInstance
+    boolean mRetainInstanceChangedWhileDetached
+    android.os.Bundle mSavedFragmentState
+    androidx.savedstate.SavedStateRegistryController mSavedStateRegistryController
+    java.lang.Boolean mSavedUserVisibleHint
+    android.util.SparseArray mSavedViewState
+    int mState
+    java.lang.String mTag
+    androidx.fragment.app.Fragment mTarget
+    int mTargetRequestCode
+    java.lang.String mTargetWho
+    boolean mUserVisibleHint
+    androidx.fragment.app.FragmentViewLifecycleOwner mViewLifecycleOwner
+    androidx.lifecycle.MutableLiveData mViewLifecycleOwnerLiveData
+    java.lang.String mWho
+    static void <clinit>()
+    public void <init>()
+    public void <init>(int)
+    void callStartTransitionListener()
+    public void dump(java.lang.String,java.io.FileDescriptor,java.io.PrintWriter,java.lang.String[])
+    private androidx.fragment.app.Fragment$AnimationInfo ensureAnimationInfo()
+    public final boolean equals(java.lang.Object)
+    androidx.fragment.app.Fragment findFragmentByWho(java.lang.String)
+    public final androidx.fragment.app.FragmentActivity getActivity()
+    public boolean getAllowEnterTransitionOverlap()
+    public boolean getAllowReturnTransitionOverlap()
+    android.view.View getAnimatingAway()
+    android.animation.Animator getAnimator()
+    public final android.os.Bundle getArguments()
+    public final androidx.fragment.app.FragmentManager getChildFragmentManager()
+    public android.content.Context getContext()
+    public java.lang.Object getEnterTransition()
+    androidx.core.app.SharedElementCallback getEnterTransitionCallback()
+    public java.lang.Object getExitTransition()
+    androidx.core.app.SharedElementCallback getExitTransitionCallback()
+    public final androidx.fragment.app.FragmentManager getFragmentManager()
+    public final java.lang.Object getHost()
+    public final int getId()
+    public final android.view.LayoutInflater getLayoutInflater()
+    public android.view.LayoutInflater getLayoutInflater(android.os.Bundle)
+    public androidx.lifecycle.Lifecycle getLifecycle()
+    public androidx.loader.app.LoaderManager getLoaderManager()
+    int getNextAnim()
+    int getNextTransition()
+    int getNextTransitionStyle()
+    public final androidx.fragment.app.Fragment getParentFragment()
+    public java.lang.Object getReenterTransition()
+    public final android.content.res.Resources getResources()
+    public final boolean getRetainInstance()
+    public java.lang.Object getReturnTransition()
+    public final androidx.savedstate.SavedStateRegistry getSavedStateRegistry()
+    public java.lang.Object getSharedElementEnterTransition()
+    public java.lang.Object getSharedElementReturnTransition()
+    int getStateAfterAnimating()
+    public final java.lang.String getString(int)
+    public final varargs java.lang.String getString(int,java.lang.Object[])
+    public final java.lang.String getTag()
+    public final androidx.fragment.app.Fragment getTargetFragment()
+    public final int getTargetRequestCode()
+    public final java.lang.CharSequence getText(int)
+    public boolean getUserVisibleHint()
+    public android.view.View getView()
+    public androidx.lifecycle.LifecycleOwner getViewLifecycleOwner()
+    public androidx.lifecycle.LiveData getViewLifecycleOwnerLiveData()
+    public androidx.lifecycle.ViewModelStore getViewModelStore()
+    public final boolean hasOptionsMenu()
+    public final int hashCode()
+    private void initLifecycle()
+    void initState()
+    public static androidx.fragment.app.Fragment instantiate(android.content.Context,java.lang.String)
+    public static androidx.fragment.app.Fragment instantiate(android.content.Context,java.lang.String,android.os.Bundle)
+    public final boolean isAdded()
+    public final boolean isDetached()
+    public final boolean isHidden()
+    boolean isHideReplaced()
+    final boolean isInBackStack()
+    public final boolean isInLayout()
+    public final boolean isMenuVisible()
+    boolean isPostponed()
+    public final boolean isRemoving()
+    public final boolean isResumed()
+    public final boolean isStateSaved()
+    public final boolean isVisible()
+    void noteStateNotSaved()
+    public void onActivityCreated(android.os.Bundle)
+    public void onActivityResult(int,int,android.content.Intent)
+    public void onAttach(android.app.Activity)
+    public void onAttach(android.content.Context)
+    public void onAttachFragment(androidx.fragment.app.Fragment)
+    public void onConfigurationChanged(android.content.res.Configuration)
+    public boolean onContextItemSelected(android.view.MenuItem)
+    public void onCreate(android.os.Bundle)
+    public android.view.animation.Animation onCreateAnimation(int,boolean,int)
+    public android.animation.Animator onCreateAnimator(int,boolean,int)
+    public void onCreateContextMenu(android.view.ContextMenu,android.view.View,android.view.ContextMenu$ContextMenuInfo)
+    public void onCreateOptionsMenu(android.view.Menu,android.view.MenuInflater)
+    public android.view.View onCreateView(android.view.LayoutInflater,android.view.ViewGroup,android.os.Bundle)
+    public void onDestroy()
+    public void onDestroyOptionsMenu()
+    public void onDestroyView()
+    public void onDetach()
+    public android.view.LayoutInflater onGetLayoutInflater(android.os.Bundle)
+    public void onHiddenChanged(boolean)
+    public void onInflate(android.app.Activity,android.util.AttributeSet,android.os.Bundle)
+    public void onInflate(android.content.Context,android.util.AttributeSet,android.os.Bundle)
+    public void onLowMemory()
+    public void onMultiWindowModeChanged(boolean)
+    public boolean onOptionsItemSelected(android.view.MenuItem)
+    public void onOptionsMenuClosed(android.view.Menu)
+    public void onPause()
+    public void onPictureInPictureModeChanged(boolean)
+    public void onPrepareOptionsMenu(android.view.Menu)
+    public void onPrimaryNavigationFragmentChanged(boolean)
+    public void onRequestPermissionsResult(int,java.lang.String[],int[])
+    public void onResume()
+    public void onSaveInstanceState(android.os.Bundle)
+    public void onStart()
+    public void onStop()
+    public void onViewCreated(android.view.View,android.os.Bundle)
+    public void onViewStateRestored(android.os.Bundle)
+    void performActivityCreated(android.os.Bundle)
+    void performAttach()
+    void performConfigurationChanged(android.content.res.Configuration)
+    boolean performContextItemSelected(android.view.MenuItem)
+    void performCreate(android.os.Bundle)
+    boolean performCreateOptionsMenu(android.view.Menu,android.view.MenuInflater)
+    void performCreateView(android.view.LayoutInflater,android.view.ViewGroup,android.os.Bundle)
+    void performDestroy()
+    void performDestroyView()
+    void performDetach()
+    android.view.LayoutInflater performGetLayoutInflater(android.os.Bundle)
+    void performLowMemory()
+    void performMultiWindowModeChanged(boolean)
+    boolean performOptionsItemSelected(android.view.MenuItem)
+    void performOptionsMenuClosed(android.view.Menu)
+    void performPause()
+    void performPictureInPictureModeChanged(boolean)
+    boolean performPrepareOptionsMenu(android.view.Menu)
+    void performPrimaryNavigationFragmentChanged()
+    void performResume()
+    void performSaveInstanceState(android.os.Bundle)
+    void performStart()
+    void performStop()
+    public void postponeEnterTransition()
+    public final void postponeEnterTransition(long,java.util.concurrent.TimeUnit)
+    public void registerForContextMenu(android.view.View)
+    public final void requestPermissions(java.lang.String[],int)
+    public final androidx.fragment.app.FragmentActivity requireActivity()
+    public final android.os.Bundle requireArguments()
+    public final android.content.Context requireContext()
+    public final androidx.fragment.app.FragmentManager requireFragmentManager()
+    public final java.lang.Object requireHost()
+    public final androidx.fragment.app.Fragment requireParentFragment()
+    public final android.view.View requireView()
+    void restoreChildFragmentState(android.os.Bundle)
+    final void restoreViewState(android.os.Bundle)
+    public void setAllowEnterTransitionOverlap(boolean)
+    public void setAllowReturnTransitionOverlap(boolean)
+    void setAnimatingAway(android.view.View)
+    void setAnimator(android.animation.Animator)
+    public void setArguments(android.os.Bundle)
+    public void setEnterSharedElementCallback(androidx.core.app.SharedElementCallback)
+    public void setEnterTransition(java.lang.Object)
+    public void setExitSharedElementCallback(androidx.core.app.SharedElementCallback)
+    public void setExitTransition(java.lang.Object)
+    public void setHasOptionsMenu(boolean)
+    void setHideReplaced(boolean)
+    public void setInitialSavedState(androidx.fragment.app.Fragment$SavedState)
+    public void setMenuVisibility(boolean)
+    void setNextAnim(int)
+    void setNextTransition(int,int)
+    void setOnStartEnterTransitionListener(androidx.fragment.app.Fragment$OnStartEnterTransitionListener)
+    public void setReenterTransition(java.lang.Object)
+    public void setRetainInstance(boolean)
+    public void setReturnTransition(java.lang.Object)
+    public void setSharedElementEnterTransition(java.lang.Object)
+    public void setSharedElementReturnTransition(java.lang.Object)
+    void setStateAfterAnimating(int)
+    public void setTargetFragment(androidx.fragment.app.Fragment,int)
+    public void setUserVisibleHint(boolean)
+    public boolean shouldShowRequestPermissionRationale(java.lang.String)
+    public void startActivity(android.content.Intent)
+    public void startActivity(android.content.Intent,android.os.Bundle)
+    public void startActivityForResult(android.content.Intent,int)
+    public void startActivityForResult(android.content.Intent,int,android.os.Bundle)
+    public void startIntentSenderForResult(android.content.IntentSender,int,android.content.Intent,int,int,int,android.os.Bundle)
+    public void startPostponedEnterTransition()
+    public java.lang.String toString()
+    public void unregisterForContextMenu(android.view.View)
 androidx.fragment.app.FragmentActivity$HostCallbacks
 androidx.fragment.app.FragmentActivity
 androidx.fragment.app.FragmentContainer
@@ -1530,95 +1746,74 @@ androidx.fragment.app.ListFragment$2
 androidx.fragment.app.ListFragment
 androidx.fragment.app.SuperNotCalledException
 androidx.lifecycle.AndroidViewModel
-androidx.lifecycle.ClassesInfoCache$CallbackInfo
-androidx.lifecycle.ClassesInfoCache$MethodReference
-androidx.lifecycle.ClassesInfoCache
-androidx.lifecycle.CompositeGeneratedAdaptersObserver:
-    private final androidx.lifecycle.GeneratedAdapter[] mGeneratedAdapters
-    void <init>(androidx.lifecycle.GeneratedAdapter[])
-    public void onStateChanged(androidx.lifecycle.LifecycleOwner,androidx.lifecycle.Lifecycle$Event)
+androidx.lifecycle.ClassesInfoCache:
+    private static final int CALL_TYPE_NO_ARG
+    private static final int CALL_TYPE_PROVIDER
+    private static final int CALL_TYPE_PROVIDER_WITH_EVENT
 androidx.lifecycle.ComputableLiveData$1
 androidx.lifecycle.ComputableLiveData$2
 androidx.lifecycle.ComputableLiveData$3
 androidx.lifecycle.ComputableLiveData
-androidx.lifecycle.DefaultLifecycleObserver
-androidx.lifecycle.FullLifecycleObserver
-androidx.lifecycle.FullLifecycleObserverAdapter$1
-androidx.lifecycle.FullLifecycleObserverAdapter:
-    private final androidx.lifecycle.FullLifecycleObserver mFullLifecycleObserver
-    private final androidx.lifecycle.LifecycleEventObserver mLifecycleEventObserver
-    void <init>(androidx.lifecycle.FullLifecycleObserver,androidx.lifecycle.LifecycleEventObserver)
-    public void onStateChanged(androidx.lifecycle.LifecycleOwner,androidx.lifecycle.Lifecycle$Event)
-androidx.lifecycle.GeneratedAdapter
 androidx.lifecycle.GenericLifecycleObserver
-androidx.lifecycle.Lifecycle$State:
-    public boolean isAtLeast(androidx.lifecycle.Lifecycle$State)
-androidx.lifecycle.Lifecycle:
-    public abstract void addObserver(androidx.lifecycle.LifecycleObserver)
-    public abstract androidx.lifecycle.Lifecycle$State getCurrentState()
-    public abstract void removeObserver(androidx.lifecycle.LifecycleObserver)
-androidx.lifecycle.LifecycleEventObserver
-androidx.lifecycle.LifecycleObserver
-androidx.lifecycle.LifecycleOwner:
-    public abstract androidx.lifecycle.Lifecycle getLifecycle()
-androidx.lifecycle.LifecycleRegistry$ObserverWithState:
-    androidx.lifecycle.LifecycleEventObserver mLifecycleObserver
-    void <init>(androidx.lifecycle.LifecycleObserver,androidx.lifecycle.Lifecycle$State)
 androidx.lifecycle.LifecycleRegistry:
-    public void addObserver(androidx.lifecycle.LifecycleObserver)
-    private androidx.lifecycle.Lifecycle$State calculateTargetState(androidx.lifecycle.LifecycleObserver)
-    public androidx.lifecycle.Lifecycle$State getCurrentState()
     public int getObserverCount()
     public void markState(androidx.lifecycle.Lifecycle$State)
-    static androidx.lifecycle.Lifecycle$State min(androidx.lifecycle.Lifecycle$State,androidx.lifecycle.Lifecycle$State)
-    public void removeObserver(androidx.lifecycle.LifecycleObserver)
     public void setCurrentState(androidx.lifecycle.Lifecycle$State)
 androidx.lifecycle.LifecycleRegistryOwner
 androidx.lifecycle.Lifecycling$1:
-    final synthetic androidx.lifecycle.LifecycleEventObserver val$observer
     void <init>(androidx.lifecycle.LifecycleEventObserver)
-    public void onStateChanged(androidx.lifecycle.LifecycleOwner,androidx.lifecycle.Lifecycle$Event)
-androidx.lifecycle.Lifecycling
+androidx.lifecycle.Lifecycling:
+    private static final int GENERATED_CALLBACK
+    private static final int REFLECTIVE_CALLBACK
+    private void <init>()
+    static androidx.lifecycle.GenericLifecycleObserver getCallback(java.lang.Object)
 androidx.lifecycle.LiveData$1
 androidx.lifecycle.LiveData$AlwaysActiveObserver
 androidx.lifecycle.LiveData$LifecycleBoundObserver:
-    final androidx.lifecycle.LifecycleOwner mOwner
-    final synthetic androidx.lifecycle.LiveData this$0
     void <init>(androidx.lifecycle.LiveData,androidx.lifecycle.LifecycleOwner,androidx.lifecycle.Observer)
     void detachObserver()
     boolean isAttachedTo(androidx.lifecycle.LifecycleOwner)
-    public void onStateChanged(androidx.lifecycle.LifecycleOwner,androidx.lifecycle.Lifecycle$Event)
-    boolean shouldBeActive()
 androidx.lifecycle.LiveData$ObserverWrapper:
-    boolean mActive
     int mLastVersion
-    final androidx.lifecycle.Observer mObserver
-    final synthetic androidx.lifecycle.LiveData this$0
     void <init>(androidx.lifecycle.LiveData,androidx.lifecycle.Observer)
-    void activeStateChanged(boolean)
     void detachObserver()
     boolean isAttachedTo(androidx.lifecycle.LifecycleOwner)
     abstract boolean shouldBeActive()
-androidx.lifecycle.LiveData
+androidx.lifecycle.LiveData:
+    static final java.lang.Object NOT_SET
+    static final int START_VERSION
+    private volatile java.lang.Object mData
+    final java.lang.Object mDataLock
+    private boolean mDispatchInvalidated
+    private boolean mDispatchingValue
+    private androidx.arch.core.internal.SafeIterableMap mObservers
+    volatile java.lang.Object mPendingData
+    private final java.lang.Runnable mPostValueRunnable
+    private int mVersion
+    static void <clinit>()
+    public void <init>()
+    private static void assertMainThread(java.lang.String)
+    private void considerNotify(androidx.lifecycle.LiveData$ObserverWrapper)
+    public java.lang.Object getValue()
+    int getVersion()
+    public boolean hasActiveObservers()
+    public boolean hasObservers()
+    public void observe(androidx.lifecycle.LifecycleOwner,androidx.lifecycle.Observer)
+    public void observeForever(androidx.lifecycle.Observer)
+    protected void postValue(java.lang.Object)
+    public void removeObservers(androidx.lifecycle.LifecycleOwner)
+    protected void setValue(java.lang.Object)
 androidx.lifecycle.MediatorLiveData$Source
 androidx.lifecycle.MediatorLiveData
-androidx.lifecycle.MethodCallsLogger
+androidx.lifecycle.MethodCallsLogger:
+    public boolean approveCall(java.lang.String,int)
 androidx.lifecycle.MutableLiveData
-androidx.lifecycle.Observer
-androidx.lifecycle.OnLifecycleEvent
+androidx.lifecycle.Observer:
+    public abstract void onChanged(java.lang.Object)
 androidx.lifecycle.R
-androidx.lifecycle.ReflectiveGenericLifecycleObserver:
-    private final androidx.lifecycle.ClassesInfoCache$CallbackInfo mInfo
-    private final java.lang.Object mWrapped
-    void <init>(java.lang.Object)
-    public void onStateChanged(androidx.lifecycle.LifecycleOwner,androidx.lifecycle.Lifecycle$Event)
 androidx.lifecycle.ReportFragment$ActivityInitializationListener
 androidx.lifecycle.ReportFragment$LifecycleCallbacks
 androidx.lifecycle.ReportFragment
-androidx.lifecycle.SingleGeneratedAdapterObserver:
-    private final androidx.lifecycle.GeneratedAdapter mGeneratedAdapter
-    void <init>(androidx.lifecycle.GeneratedAdapter)
-    public void onStateChanged(androidx.lifecycle.LifecycleOwner,androidx.lifecycle.Lifecycle$Event)
 androidx.lifecycle.Transformations$1
 androidx.lifecycle.Transformations$2$1
 androidx.lifecycle.Transformations$2
@@ -1629,7 +1824,12 @@ androidx.lifecycle.ViewModelProvider$Factory
 androidx.lifecycle.ViewModelProvider$KeyedFactory
 androidx.lifecycle.ViewModelProvider$NewInstanceFactory
 androidx.lifecycle.ViewModelProvider
-androidx.lifecycle.ViewModelStore
+androidx.lifecycle.ViewModelStore:
+    private final java.util.HashMap mMap
+    public void <init>()
+    final androidx.lifecycle.ViewModel get(java.lang.String)
+    java.util.Set keys()
+    final void put(java.lang.String,androidx.lifecycle.ViewModel)
 androidx.lifecycle.ViewModelStoreOwner
 androidx.lifecycle.livedata.R
 androidx.lifecycle.livedata.core.R
@@ -1673,19 +1873,24 @@ androidx.savedstate.Recreator$SavedStateProvider
 androidx.savedstate.Recreator:
     static final java.lang.String CLASSES_KEY
     static final java.lang.String COMPONENT_KEY
-    private final androidx.savedstate.SavedStateRegistryOwner mOwner
     void <init>(androidx.savedstate.SavedStateRegistryOwner)
-    public void onStateChanged(androidx.lifecycle.LifecycleOwner,androidx.lifecycle.Lifecycle$Event)
-    private void reflectiveNew(java.lang.String)
 androidx.savedstate.SavedStateRegistry$1:
-    final synthetic androidx.savedstate.SavedStateRegistry this$0
     void <init>(androidx.savedstate.SavedStateRegistry)
-    public void onStateChanged(androidx.lifecycle.LifecycleOwner,androidx.lifecycle.Lifecycle$Event)
-androidx.savedstate.SavedStateRegistry$AutoRecreated
 androidx.savedstate.SavedStateRegistry$SavedStateProvider
-androidx.savedstate.SavedStateRegistry
+androidx.savedstate.SavedStateRegistry:
+    private static final java.lang.String SAVED_COMPONENTS_KEY
+    private androidx.arch.core.internal.SafeIterableMap mComponents
+    private androidx.savedstate.Recreator$SavedStateProvider mRecreatorProvider
+    private boolean mRestored
+    private android.os.Bundle mRestoredState
+    void <init>()
+    public boolean isRestored()
+    void performRestore(androidx.lifecycle.Lifecycle,android.os.Bundle)
+    void performSave(android.os.Bundle)
+    public void registerSavedStateProvider(java.lang.String,androidx.savedstate.SavedStateRegistry$SavedStateProvider)
+    public void runOnNextRecreation(java.lang.Class)
+    public void unregisterSavedStateProvider(java.lang.String)
 androidx.savedstate.SavedStateRegistryController
-androidx.savedstate.SavedStateRegistryOwner
 androidx.tracing.R
 androidx.tracing.Trace:
     static final java.lang.String TAG
@@ -1878,6 +2083,24 @@ com.example.douyin_downloader.R$drawable:
 com.example.douyin_downloader.R$mipmap
 com.example.douyin_downloader.R$style
 com.example.douyin_downloader.R
+com.mr.flutter.plugin.filepicker.FilePickerDelegate:
+    private static final java.lang.String TAG
+com.mr.flutter.plugin.filepicker.FilePickerPlugin:
+    private static final java.lang.String CHANNEL
+    private static final java.lang.String EVENT_CHANNEL
+    private static final java.lang.String TAG
+    public static void registerWith(io.flutter.plugin.common.PluginRegistry$Registrar)
+com.mr.flutter.plugin.filepicker.FileUtils:
+    private static final java.lang.String PRIMARY_VOLUME_NAME
+    private static final java.lang.String TAG
+    public void <init>()
+    public static java.util.HashMap createFileInfoMap(java.io.File)
+    public static java.lang.String getDataColumn(android.content.Context,android.net.Uri,java.lang.String,java.lang.String[])
+    public static java.lang.String getRealPathFromURI(android.content.Context,android.net.Uri)
+    public static boolean isExternalStorageDocument(android.net.Uri)
+    public static boolean isGooglePhotosUri(android.net.Uri)
+    public static boolean isMediaDocument(android.net.Uri)
+com.mr.flutter.plugin.filepicker.R
 dev.fluttercommunity.plus.device_info.R
 io.flutter.BuildConfig
 io.flutter.FlutterInjector$Builder:
@@ -2028,7 +2251,6 @@ io.flutter.embedding.engine.FlutterEngineConnectionRegistry$FlutterEngineActivit
     public void addOnSaveStateListener(io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding$OnSaveInstanceStateListener)
     public void addOnUserLeaveHintListener(io.flutter.plugin.common.PluginRegistry$UserLeaveHintListener)
     public void addOnWindowFocusChangedListener(io.flutter.plugin.common.PluginRegistry$WindowFocusChangedListener)
-    public java.lang.Object getLifecycle()
     void onWindowFocusChanged(boolean)
     public void removeOnNewIntentListener(io.flutter.plugin.common.PluginRegistry$NewIntentListener)
     public void removeOnSaveStateListener(io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding$OnSaveInstanceStateListener)
@@ -2125,7 +2347,6 @@ io.flutter.embedding.engine.dart.DartExecutor$DartCallback
 io.flutter.embedding.engine.dart.DartExecutor$DefaultBinaryMessenger:
     public void disableBufferingIncomingMessages()
     public void enableBufferingIncomingMessages()
-    public void send(java.lang.String,java.nio.ByteBuffer)
 io.flutter.embedding.engine.dart.DartExecutor:
     private static final java.lang.String TAG
     public void disableBufferingIncomingMessages()
@@ -2133,14 +2354,12 @@ io.flutter.embedding.engine.dart.DartExecutor:
     public void executeDartCallback(io.flutter.embedding.engine.dart.DartExecutor$DartCallback)
     public void executeDartEntrypoint(io.flutter.embedding.engine.dart.DartExecutor$DartEntrypoint)
     public int getPendingChannelResponseCount()
-    public void send(java.lang.String,java.nio.ByteBuffer)
     public void setIsolateServiceIdListener(io.flutter.embedding.engine.dart.DartExecutor$IsolateServiceIdListener)
 io.flutter.embedding.engine.dart.DartMessenger:
     private static final java.lang.String TAG
     public void disableBufferingIncomingMessages()
     public void enableBufferingIncomingMessages()
     public int getPendingChannelResponseCount()
-    public void send(java.lang.String,java.nio.ByteBuffer)
 io.flutter.embedding.engine.deferredcomponents.DeferredComponentManager:
     public abstract void loadAssets(int,java.lang.String)
     public abstract void loadDartLibrary(int,java.lang.String)
@@ -2241,7 +2460,6 @@ io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding:
     public abstract void addOnSaveStateListener(io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding$OnSaveInstanceStateListener)
     public abstract void addOnUserLeaveHintListener(io.flutter.plugin.common.PluginRegistry$UserLeaveHintListener)
     public abstract void addOnWindowFocusChangedListener(io.flutter.plugin.common.PluginRegistry$WindowFocusChangedListener)
-    public abstract java.lang.Object getLifecycle()
     public abstract void removeOnNewIntentListener(io.flutter.plugin.common.PluginRegistry$NewIntentListener)
     public abstract void removeOnSaveStateListener(io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding$OnSaveInstanceStateListener)
     public abstract void removeOnUserLeaveHintListener(io.flutter.plugin.common.PluginRegistry$UserLeaveHintListener)
@@ -2252,6 +2470,8 @@ io.flutter.embedding.engine.plugins.broadcastreceiver.BroadcastReceiverPluginBin
 io.flutter.embedding.engine.plugins.contentprovider.ContentProviderControlSurface
 io.flutter.embedding.engine.plugins.contentprovider.ContentProviderPluginBinding:
     public abstract android.content.ContentProvider getContentProvider()
+io.flutter.embedding.engine.plugins.lifecycle.FlutterLifecycleAdapter:
+    public void <init>()
 io.flutter.embedding.engine.plugins.service.ServiceAware$OnModeChangeListener
 io.flutter.embedding.engine.plugins.service.ServiceControlSurface
 io.flutter.embedding.engine.plugins.service.ServicePluginBinding:
@@ -2337,14 +2557,15 @@ io.flutter.plugin.common.BinaryMessenger$TaskQueueOptions:
 io.flutter.plugin.common.BinaryMessenger:
     public void disableBufferingIncomingMessages()
     public void enableBufferingIncomingMessages()
-    public abstract void send(java.lang.String,java.nio.ByteBuffer)
 io.flutter.plugin.common.ErrorLogResult
-io.flutter.plugin.common.EventChannel$1
-io.flutter.plugin.common.EventChannel$EventSink
-io.flutter.plugin.common.EventChannel$IncomingStreamRequestHandler$EventSinkImplementation
-io.flutter.plugin.common.EventChannel$IncomingStreamRequestHandler
-io.flutter.plugin.common.EventChannel$StreamHandler
-io.flutter.plugin.common.EventChannel
+io.flutter.plugin.common.EventChannel$EventSink:
+    public abstract void endOfStream()
+    public abstract void error(java.lang.String,java.lang.String,java.lang.Object)
+io.flutter.plugin.common.EventChannel$IncomingStreamRequestHandler$EventSinkImplementation:
+    public void endOfStream()
+    public void error(java.lang.String,java.lang.String,java.lang.Object)
+io.flutter.plugin.common.EventChannel:
+    private static final java.lang.String TAG
 io.flutter.plugin.common.FlutterException:
     private static final java.lang.String TAG
 io.flutter.plugin.common.JSONUtil:
@@ -2451,6 +2672,9 @@ io.flutter.plugin.platform.VirtualDisplayController:
     public void dispose()
     void onFlutterViewAttached(android.view.View)
     void onFlutterViewDetached()
+io.flutter.plugins.flutter_plugin_android_lifecycle.FlutterAndroidLifecyclePlugin:
+    public static void registerWith(io.flutter.plugin.common.PluginRegistry$Registrar)
+io.flutter.plugins.flutter_plugin_android_lifecycle.R
 io.flutter.plugins.pathprovider.Messages$FlutterError:
     public void <init>(java.lang.String,java.lang.String,java.lang.Object)
 io.flutter.plugins.pathprovider.Messages:
@@ -9063,29 +9287,17 @@ org.jetbrains.annotations.NotNull
 org.jetbrains.annotations.Nullable
 org.jetbrains.annotations.PropertyKey
 org.jetbrains.annotations.TestOnly
-androidx.activity.ImmLeaksCleaner:
-    private static int sReflectedFieldsInitialized
+androidx.activity.ComponentActivity$2:
+    final synthetic androidx.activity.ComponentActivity this$0
+androidx.activity.ComponentActivity$3:
+    final synthetic androidx.activity.ComponentActivity this$0
+androidx.activity.ComponentActivity
+androidx.activity.OnBackPressedCallback
+androidx.activity.OnBackPressedDispatcher$LifecycleOnBackPressedCancellable:
+    private final androidx.activity.OnBackPressedCallback mOnBackPressedCallback
+    final synthetic androidx.activity.OnBackPressedDispatcher this$0
 androidx.activity.OnBackPressedDispatcher
 androidx.activity.OnBackPressedDispatcherOwner
-androidx.arch.core.internal.FastSafeIterableMap:
-    public boolean contains(java.lang.Object)
-androidx.arch.core.internal.SafeIterableMap$AscendingIterator:
-    androidx.arch.core.internal.SafeIterableMap$Entry forward(androidx.arch.core.internal.SafeIterableMap$Entry)
-androidx.arch.core.internal.SafeIterableMap$DescendingIterator
-androidx.arch.core.internal.SafeIterableMap$Entry:
-    androidx.arch.core.internal.SafeIterableMap$Entry mNext
-    androidx.arch.core.internal.SafeIterableMap$Entry mPrevious
-androidx.arch.core.internal.SafeIterableMap$IteratorWithAdditions
-androidx.arch.core.internal.SafeIterableMap$ListIterator:
-    androidx.arch.core.internal.SafeIterableMap$Entry mExpectedEnd
-    androidx.arch.core.internal.SafeIterableMap$Entry mNext
-    abstract androidx.arch.core.internal.SafeIterableMap$Entry forward(androidx.arch.core.internal.SafeIterableMap$Entry)
-androidx.arch.core.internal.SafeIterableMap:
-    private androidx.arch.core.internal.SafeIterableMap$Entry mEnd
-    androidx.arch.core.internal.SafeIterableMap$Entry mStart
-    public java.util.Iterator descendingIterator()
-    public androidx.arch.core.internal.SafeIterableMap$IteratorWithAdditions iteratorWithAdditions()
-    public java.util.Map$Entry newest()
 androidx.core.app.ActivityCompat$$InternalSyntheticThrowCCEIfNotNull$8$bb031996eabc66edd73b70d777c82a78f2217e0f26c52ec463cfd2c2e32c2fa4$0
 androidx.core.app.ActivityCompat$1$$InternalSyntheticThrowCCEIfNotNull$8$1bbada9f4d07d1e83eb4d53ad56371351f1694fe07ec40a6d4a811ec88467a8b$0
 androidx.core.app.ActivityCompat$1
@@ -9094,20 +9306,41 @@ androidx.core.app.ActivityCompat$PermissionCompatDelegate
 androidx.core.app.ActivityCompat$RequestPermissionsRequestCodeValidator
 androidx.core.app.ActivityCompat:
     private static androidx.core.app.ActivityCompat$PermissionCompatDelegate sDelegate
+androidx.core.app.ComponentActivity
 androidx.core.app.CoreComponentFactory$$InternalSyntheticThrowCCEIfNotNull$8$63f81007c039b90f803abbc92d2dc4a9b588da3cd2b16cb150e1e43c92db0ff5$0
 androidx.core.app.CoreComponentFactory$CompatWrapped
-androidx.lifecycle.LifecycleRegistry$$InternalSyntheticThrowCCEIfNotNull$8$2aa0864d5ce481d749ae84eaf04071936d001636b8268efda6f66f3c2dc728f4$0
-androidx.lifecycle.LifecycleRegistry$$InternalSyntheticThrowCCEIfNotNull$8$3505aa5763df52124de7d77ff7ff76fb6893b686f0579017757722de3ebc4537$1
-androidx.lifecycle.LifecycleRegistry$$InternalSyntheticThrowCCEIfNotNull$8$c135bac724417535879d1c147dbd2929098053171dc3addeb3d2a817103c0192$1
-androidx.lifecycle.LifecycleRegistry$$InternalSyntheticThrowCCEIfNotNull$8$d1db59aff89449e61153fbc2e8f9954c36418acbf101529fe85fcd83904b0959$0
-androidx.lifecycle.LifecycleRegistry$ObserverWithState
-androidx.lifecycle.LifecycleRegistry:
-    private void backwardPass(androidx.lifecycle.LifecycleOwner)
-    private static androidx.lifecycle.Lifecycle$Event downEvent(androidx.lifecycle.Lifecycle$State)
-    private void forwardPass(androidx.lifecycle.LifecycleOwner)
-    private void popParentState()
-    private void pushParentState(androidx.lifecycle.Lifecycle$State)
-    private static androidx.lifecycle.Lifecycle$Event upEvent(androidx.lifecycle.Lifecycle$State)
+androidx.fragment.app.Fragment$2:
+    final synthetic androidx.fragment.app.Fragment this$0
+androidx.fragment.app.Fragment
+androidx.lifecycle.DefaultLifecycleObserver$-CC
+androidx.lifecycle.DefaultLifecycleObserver:
+    public abstract void onCreate(androidx.lifecycle.LifecycleOwner)
+    public abstract void onDestroy(androidx.lifecycle.LifecycleOwner)
+    public abstract void onPause(androidx.lifecycle.LifecycleOwner)
+    public abstract void onResume(androidx.lifecycle.LifecycleOwner)
+    public abstract void onStart(androidx.lifecycle.LifecycleOwner)
+    public abstract void onStop(androidx.lifecycle.LifecycleOwner)
+androidx.lifecycle.GeneratedAdapter:
+    public abstract void callMethods(androidx.lifecycle.LifecycleOwner,androidx.lifecycle.Lifecycle$Event,boolean,androidx.lifecycle.MethodCallsLogger)
+androidx.lifecycle.LiveData$LifecycleBoundObserver:
+    final synthetic androidx.lifecycle.LiveData this$0
+androidx.lifecycle.LiveData$ObserverWrapper:
+    final androidx.lifecycle.Observer mObserver
+    final synthetic androidx.lifecycle.LiveData this$0
+androidx.lifecycle.LiveData
+androidx.lifecycle.Observer
+androidx.lifecycle.SingleGeneratedAdapterObserver:
+    private final androidx.lifecycle.GeneratedAdapter mGeneratedAdapter
+androidx.lifecycle.ViewModelStore
+androidx.savedstate.Recreator$$InternalSyntheticThrowCCEIfNotNull$8$5aa756d928e034d37d2d4a8ae69ac31b4eb43f6b3c08646c337288790dee31c7$0
+androidx.savedstate.Recreator:
+    private final androidx.savedstate.SavedStateRegistryOwner mOwner
+    private void reflectiveNew(java.lang.String)
+androidx.savedstate.SavedStateRegistry$1:
+    final synthetic androidx.savedstate.SavedStateRegistry this$0
+androidx.savedstate.SavedStateRegistry$AutoRecreated
+androidx.savedstate.SavedStateRegistry
+androidx.savedstate.SavedStateRegistryOwner
 com.baseflow.permissionhandler.PermissionHandlerPlugin:
     private io.flutter.plugin.common.PluginRegistry$Registrar pluginRegistrar
 com.baseflow.permissionhandler.ServiceManager:
@@ -9197,7 +9430,6 @@ io.flutter.embedding.engine.systemchannels.DeferredComponentChannel:
 io.flutter.embedding.engine.systemchannels.PlatformViewsChannel:
     public void invokeViewFocused(int)
 io.flutter.plugin.common.PluginRegistry$NewIntentListener
-io.flutter.plugin.common.PluginRegistry$Registrar
 io.flutter.plugin.common.PluginRegistry$UserLeaveHintListener
 io.flutter.plugin.editing.TextInputPlugin:
     public void clearPlatformViewClient(int)

@@ -10,6 +10,12 @@
       name=":@@:permission_handler_android::release"
       project=":permission_handler_android"/>
   <library
+      name=":@@:flutter_plugin_android_lifecycle::release"
+      project=":flutter_plugin_android_lifecycle"/>
+  <library
+      name=":@@:file_picker::release"
+      project=":file_picker"/>
+  <library
       name=":@@:device_info_plus::release"
       project=":device_info_plus"/>
   <library

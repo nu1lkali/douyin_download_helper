@@ -30,6 +30,32 @@
       externalAnnotations="annotations.zip"
       proguardRules="proguard.txt"/>
   <library
+      name=":@@:flutter_plugin_android_lifecycle::release"
+      jars="C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\flutter_plugin_android_lifecycle\.transforms\262531b4073430560e61df59f1d50690\transformed\out\jars\classes.jar;C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\flutter_plugin_android_lifecycle\.transforms\262531b4073430560e61df59f1d50690\transformed\out\jars\libs\R.jar"
+      resolved="io.flutter.plugins.flutter_plugin_android_lifecycle:flutter_plugin_android_lifecycle:unspecified"
+      folder="C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\flutter_plugin_android_lifecycle\.transforms\262531b4073430560e61df59f1d50690\transformed\out"
+      manifest="AndroidManifest.xml"
+      resFolder="res"
+      assetsFolder="assets"
+      lintJar="lint.jar"
+      publicResources="public.txt"
+      symbolFile="R.txt"
+      externalAnnotations="annotations.zip"
+      proguardRules="proguard.txt"/>
+  <library
+      name=":@@:file_picker::release"
+      jars="C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\file_picker\.transforms\1ce362d25c302299b776f6ed77eb0631\transformed\out\jars\classes.jar;C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\file_picker\.transforms\1ce362d25c302299b776f6ed77eb0631\transformed\out\jars\libs\R.jar"
+      resolved="com.mr.flutter.plugin.filepicker:file_picker:unspecified"
+      folder="C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\file_picker\.transforms\1ce362d25c302299b776f6ed77eb0631\transformed\out"
+      manifest="AndroidManifest.xml"
+      resFolder="res"
+      assetsFolder="assets"
+      lintJar="lint.jar"
+      publicResources="public.txt"
+      symbolFile="R.txt"
+      externalAnnotations="annotations.zip"
+      proguardRules="proguard.txt"/>
+  <library
       name=":@@:device_info_plus::release"
       jars="C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\device_info_plus\.transforms\c07861f2968e1b6f3aa1ee55b5e80acf\transformed\out\jars\classes.jar;C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\device_info_plus\.transforms\c07861f2968e1b6f3aa1ee55b5e80acf\transformed\out\jars\libs\R.jar"
       resolved="dev.fluttercommunity.plus.device_info:device_info_plus:unspecified"

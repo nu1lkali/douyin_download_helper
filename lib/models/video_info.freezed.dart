@@ -409,6 +409,7 @@ MusicInfo _$MusicInfoFromJson(Map<String, dynamic> json) {
 mixin _$MusicInfo {
   String get title => throw _privateConstructorUsedError;
   String get author => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseNullableString)
   String get avatar => throw _privateConstructorUsedError;
   String get url => throw _privateConstructorUsedError;
 
@@ -423,7 +424,11 @@ abstract class $MusicInfoCopyWith<$Res> {
   factory $MusicInfoCopyWith(MusicInfo value, $Res Function(MusicInfo) then) =
       _$MusicInfoCopyWithImpl<$Res, MusicInfo>;
   @useResult
-  $Res call({String title, String author, String avatar, String url});
+  $Res call(
+      {String title,
+      String author,
+      @JsonKey(fromJson: _parseNullableString) String avatar,
+      String url});
 }
 
 /// @nodoc
@@ -473,7 +478,11 @@ abstract class _$$MusicInfoImplCopyWith<$Res>
       __$$MusicInfoImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String title, String author, String avatar, String url});
+  $Res call(
+      {String title,
+      String author,
+      @JsonKey(fromJson: _parseNullableString) String avatar,
+      String url});
 }
 
 /// @nodoc
@@ -517,7 +526,10 @@ class __$$MusicInfoImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$MusicInfoImpl implements _MusicInfo {
   const _$MusicInfoImpl(
-      {this.title = '', this.author = '', this.avatar = '', this.url = ''});
+      {this.title = '',
+      this.author = '',
+      @JsonKey(fromJson: _parseNullableString) this.avatar = '',
+      this.url = ''});
 
   factory _$MusicInfoImpl.fromJson(Map<String, dynamic> json) =>
       _$$MusicInfoImplFromJson(json);
@@ -529,7 +541,7 @@ class _$MusicInfoImpl implements _MusicInfo {
   @JsonKey()
   final String author;
   @override
-  @JsonKey()
+  @JsonKey(fromJson: _parseNullableString)
   final String avatar;
   @override
   @JsonKey()
@@ -573,7 +585,7 @@ abstract class _MusicInfo implements MusicInfo {
   const factory _MusicInfo(
       {final String title,
       final String author,
-      final String avatar,
+      @JsonKey(fromJson: _parseNullableString) final String avatar,
       final String url}) = _$MusicInfoImpl;
 
   factory _MusicInfo.fromJson(Map<String, dynamic> json) =
@@ -584,6 +596,7 @@ abstract class _MusicInfo implements MusicInfo {
   @override
   String get author;
   @override
+  @JsonKey(fromJson: _parseNullableString)
   String get avatar;
   @override
   String get url;
