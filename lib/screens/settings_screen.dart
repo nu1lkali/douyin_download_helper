@@ -186,8 +186,7 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
                 const SizedBox(height: 10),
                 TextField(
                   controller: _cookieController,
-                  maxLines: _showCookie ? 4 : 1,
-                  obscureText: !_showCookie,
+                  maxLines: _showCookie ? 4 : 2,
                   style: const TextStyle(fontSize: 12),
                   decoration: InputDecoration(
                     hintText: 'sessionid=xxx; uid_tt=xxx; ...',
@@ -212,19 +211,6 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
                 Row(
                   children: [
                     Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => setState(() => _cookieController.clear()),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.redAccent,
-                          side: const BorderSide(color: Colors.redAccent),
-                          minimumSize: const Size(0, 40),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        ),
-                        child: const Text('清除'),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
                       child: OutlinedButton.icon(
                         onPressed: _importCookieFromFile,
                         icon: const Icon(Icons.upload_file_rounded, size: 16),
@@ -232,18 +218,35 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
                         style: OutlinedButton.styleFrom(
                           foregroundColor: _primary,
                           side: const BorderSide(color: _primary),
-                          minimumSize: const Size(0, 40),
+                          minimumSize: const Size(0, 44),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => setState(() => _cookieController.clear()),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.redAccent,
+                          side: const BorderSide(color: Colors.redAccent),
+                          minimumSize: const Size(0, 44),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        child: const Text('清除'),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: ElevatedButton(
                         onPressed: _saveCookie,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _primary,
-                          minimumSize: const Size(0, 40),
+                          minimumSize: const Size(0, 44),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           elevation: 0,
                         ),
@@ -340,6 +343,18 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
           )),
 
           const SizedBox(height: 24),
+
+          // ── 关于 ──
+          Center(
+            child: Column(
+              children: [
+                Text('便捷下载', style: TextStyle(color: Colors.grey[400], fontSize: 13)),
+                const SizedBox(height: 2),
+                Text('Author: HACKFUN', style: TextStyle(color: Colors.grey[400], fontSize: 12)),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
         ],
       ),
     );
