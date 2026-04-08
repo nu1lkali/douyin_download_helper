@@ -1,1 +1,0 @@
-dev.fluttercommunity.plus.device_info

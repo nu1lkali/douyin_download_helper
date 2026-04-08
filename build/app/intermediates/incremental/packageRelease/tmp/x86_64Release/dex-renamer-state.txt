@@ -1,4 +1,0 @@
-#Wed Apr 08 09:21:51 CST 2026
-base.0=C\:\\Users\\FoxOS_User\\Desktop\\project\\douyin_download_helper\\build\\app\\intermediates\\dex\\release\\minifyReleaseWithR8\\classes.dex
-path.0=classes.dex
-renamed.0=classes.dex
