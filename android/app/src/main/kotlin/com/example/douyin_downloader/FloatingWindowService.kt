@@ -15,6 +15,7 @@ import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import android.content.ContentValues
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
@@ -157,6 +158,7 @@ class FloatingWindowService : Service() {
                                 downloadInBackground(result.videoUrl, false, result.albumName, fileName) { ok, msg ->
                                     mainHandler.post {
                                         btnVideo.text = if (ok) "✓ 已保存到相册" else "下载失败: $msg"
+                                        if (ok) scheduleAutoClose()
                                     }
                                 }
                             }
@@ -174,6 +176,7 @@ class FloatingWindowService : Service() {
                                         if (done == result.images.size) {
                                             mainHandler.post {
                                                 btnImages.text = "✓ ${result.images.size}张已保存到相册"
+                                                if (ok) scheduleAutoClose()
                                             }
                                         }
                                     }
@@ -198,22 +201,41 @@ class FloatingWindowService : Service() {
         Thread {
             try {
                 val tmpFile = File(cacheDir, fileName)
-
-                val conn = URL(url).openConnection() as HttpURLConnection
-                conn.setRequestProperty("User-Agent", DouyinParser.UA)
-                conn.connect()
-                FileOutputStream(tmpFile).use { out ->
-                    conn.inputStream.use { it.copyTo(out) }
-                }
-                conn.disconnect()
-
+                downloadUrl(url, tmpFile)
                 saveToGallery(tmpFile.absolutePath, albumName, fileName)
                 tmpFile.delete()
                 callback(true, null)
             } catch (e: Exception) {
-                callback(false, e.message)
+                // 1080p 失败降级到 720p
+                if (url.contains("ratio=1080p")) {
+                    try {
+                        val fallbackUrl = url.replace("ratio=1080p", "ratio=720p")
+                        val tmpFile = File(cacheDir, fileName)
+                        downloadUrl(fallbackUrl, tmpFile)
+                        saveToGallery(tmpFile.absolutePath, albumName, fileName)
+                        tmpFile.delete()
+                        callback(true, null)
+                    } catch (e2: Exception) {
+                        callback(false, e2.message)
+                    }
+                } else {
+                    callback(false, e.message)
+                }
             }
         }.start()
+    }
+
+    private fun downloadUrl(url: String, dest: File) {
+        val conn = URL(url).openConnection() as HttpURLConnection
+        conn.setRequestProperty("User-Agent", DouyinParser.UA)
+        conn.connectTimeout = 30000
+        conn.readTimeout = 60000
+        conn.connect()
+        if (conn.responseCode !in 200..299) throw Exception("HTTP ${conn.responseCode}")
+        FileOutputStream(dest).use { out ->
+            conn.inputStream.use { it.copyTo(out) }
+        }
+        conn.disconnect()
     }
 
     private fun saveToGallery(filePath: String, albumName: String, fileName: String) {
@@ -244,6 +266,13 @@ class FloatingWindowService : Service() {
             if (!dir.exists()) dir.mkdirs()
             file.copyTo(File(dir, fileName), overwrite = true)
         }
+    }
+
+    private fun scheduleAutoClose() {
+        val prefs: SharedPreferences = getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
+        val autoClose = prefs.getBoolean("flutter.compact_auto_close", true)
+        if (!autoClose) return
+        mainHandler.postDelayed({ dismissCompactPanel() }, 3000)
     }
 
     private fun dismissCompactPanel() {

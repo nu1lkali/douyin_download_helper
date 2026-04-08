@@ -358,6 +358,8 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
                   }
                 },
               ),
+              const Divider(height: 1, indent: 16, endIndent: 16),
+              _CompactAutoCloseSwitch(primary: _primary),
               if (!_hasOverlayPermission) ...[
                 const Divider(height: 1, indent: 16, endIndent: 16),
                 ListTile(
@@ -479,6 +481,43 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
     ),
     child: child,
   );
+}
+
+// 简洁模式下载后自动关闭开关
+class _CompactAutoCloseSwitch extends StatefulWidget {
+  final Color primary;
+  const _CompactAutoCloseSwitch({required this.primary});
+
+  @override
+  State<_CompactAutoCloseSwitch> createState() => _CompactAutoCloseSwitchState();
+}
+
+class _CompactAutoCloseSwitchState extends State<_CompactAutoCloseSwitch> {
+  bool _value = true;
+
+  @override
+  void initState() {
+    super.initState();
+    SettingsService.getCompactAutoClose().then((v) => setState(() => _value = v));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SwitchListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+      title: const Text('下载后自动关闭面板', style: TextStyle(fontWeight: FontWeight.w500)),
+      subtitle: Text(
+        '简洁模式下载完成后 3 秒自动关闭悬浮面板',
+        style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+      ),
+      value: _value,
+      activeColor: widget.primary,
+      onChanged: (v) async {
+        await SettingsService.setCompactAutoClose(v);
+        setState(() => _value = v);
+      },
+    );
+  }
 }
 
 // 独立的按作者分组开关（有自己的状态）

@@ -139,7 +139,12 @@ class LocalParserService {
 
     String videoUrl = '';
     if (urlList.isNotEmpty) {
-      videoUrl = (urlList[0] as String).replaceAll('playwm', 'play');
+      // 去水印 + 提升到1080p
+      videoUrl = (urlList[0] as String)
+          .replaceAll('playwm', 'play')
+          .replaceAll('ratio=720p', 'ratio=1080p')
+          .replaceAll('ratio=540p', 'ratio=1080p')
+          .replaceAll('ratio=480p', 'ratio=1080p');
     }
     if (videoUrl.isEmpty && uri.isNotEmpty) {
       videoUrl = 'https://aweme.snssdk.com/aweme/v1/play/?video_id=$uri&ratio=1080p&line=0';

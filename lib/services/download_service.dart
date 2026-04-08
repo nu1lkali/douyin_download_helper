@@ -48,11 +48,14 @@ class DownloadService {
 
   String _pad(int n) => n.toString().padLeft(2, '0');
 
-  /// 构建相册路径：相册名 或 相册名/作者名（按作者分组时）
-  Future<String> buildAlbumPath(String albumName, String author) async {
+  /// 构建相册路径：相册名 或 相册名/发布者名称(ID)（按作者分组时）
+  Future<String> buildAlbumPath(String albumName, String author, String uid) async {
     final groupByAuthor = await SettingsService.getGroupByAuthor();
     if (groupByAuthor && author.isNotEmpty) {
-      return '$albumName/${_sanitize(author)}';
+      final folderName = uid.isNotEmpty
+          ? '${_sanitize(author)}($uid)'
+          : _sanitize(author);
+      return '$albumName/$folderName';
     }
     return albumName;
   }
@@ -70,11 +73,52 @@ class DownloadService {
 
     final dir = await getTemporaryDirectory();
     final savePath = '${dir.path}/$fileName';
+    final tmpFile = File(savePath);
 
-    await _dio.download(url, savePath, onReceiveProgress: onProgress);
-    await FloatingWindowService.saveFileToGallery(savePath, fileName, albumName);
+    try {
+      // 1080p 下载失败时自动降级到 720p
+      try {
+        await _dio.download(url, savePath, onReceiveProgress: onProgress);
+      } on DioException catch (e) {
+        if (url.contains('ratio=1080p') &&
+            (e.type == DioExceptionType.connectionTimeout ||
+             e.type == DioExceptionType.receiveTimeout ||
+             e.type == DioExceptionType.badResponse)) {
+          final fallbackUrl = url.replaceAll('ratio=1080p', 'ratio=720p');
+          await _dio.download(fallbackUrl, savePath, onReceiveProgress: onProgress);
+        } else {
+          rethrow;
+        }
+      }
 
-    final file = File(savePath);
-    if (await file.exists()) await file.delete();
+      await FloatingWindowService.saveFileToGallery(savePath, fileName, albumName);
+    } on DioException catch (e) {
+      throw Exception(_friendlyDioError(e));
+    } catch (e) {
+      throw Exception('下载失败: ${e.toString().replaceAll('Exception: ', '')}');
+    } finally {
+      // 无论成功失败都清理临时文件
+      if (await tmpFile.exists()) await tmpFile.delete();
+    }
+  }
+
+  String _friendlyDioError(DioException e) {
+    switch (e.type) {
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
+        return '网络超时，请检查网络连接后重试';
+      case DioExceptionType.badResponse:
+        final code = e.response?.statusCode;
+        if (code == 403) return '视频链接已过期，请重新解析';
+        if (code == 404) return '视频资源不存在';
+        return '服务器错误 ($code)，请稍后重试';
+      case DioExceptionType.cancel:
+        return '下载已取消';
+      case DioExceptionType.connectionError:
+        return '网络连接失败，请检查网络';
+      default:
+        return '下载失败: ${e.message}';
+    }
   }
 }

@@ -37,7 +37,7 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
       final author = widget.videoInfo.author;
       final title = widget.videoInfo.title;
       final uid = widget.videoInfo.uid;
-      final album = await _downloadService.buildAlbumPath(_albumName, author);
+      final album = await _downloadService.buildAlbumPath(_albumName, author, uid);
       final fileName = _downloadService.buildFileName('video', 'mp4', author, title, uid);
       await _downloadService.downloadFile(widget.videoInfo.url, fileName, album,
         (received, total) { if (total > 0) setState(() => _progress = received / total); });
@@ -51,19 +51,29 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
 
   Future<void> _downloadAllImages() async {
     setState(() { _isDownloading = true; _progress = 0; });
+    int success = 0, failed = 0;
     try {
       final author = widget.videoInfo.author;
       final title = widget.videoInfo.title;
       final uid = widget.videoInfo.uid;
-      final album = await _downloadService.buildAlbumPath(_albumName, author);
+      final album = await _downloadService.buildAlbumPath(_albumName, author, uid);
       for (int i = 0; i < imageList.length; i++) {
-        final fileName = _downloadService.buildFileName('img_$i', 'jpg', author, title, uid);
-        await _downloadService.downloadFile(imageList[i], fileName, album, null);
+        try {
+          final fileName = _downloadService.buildFileName('img_$i', 'jpg', author, title, uid);
+          await _downloadService.downloadFile(imageList[i], fileName, album, null);
+          success++;
+        } catch (_) {
+          failed++;
+        }
         setState(() => _progress = (i + 1) / imageList.length);
       }
-      if (mounted) _showSnack('${imageList.length} 张图片已保存到相册');
-    } catch (e) {
-      if (mounted) _showSnack(e.toString());
+      if (mounted) {
+        if (failed == 0) {
+          _showSnack('${imageList.length} 张图片已保存到相册');
+        } else {
+          _showSnack('下载完成：$success 张成功，$failed 张失败');
+        }
+      }
     } finally {
       if (mounted) setState(() => _isDownloading = false);
     }
@@ -74,7 +84,7 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
       final author = widget.videoInfo.author;
       final title = widget.videoInfo.title;
       final uid = widget.videoInfo.uid;
-      final album = await _downloadService.buildAlbumPath(_albumName, author);
+      final album = await _downloadService.buildAlbumPath(_albumName, author, uid);
       final fileName = _downloadService.buildFileName('img_$index', 'jpg', author, title, uid);
       await _downloadService.downloadFile(url, fileName, album, null);
       if (mounted) _showSnack('图片已保存到相册');
@@ -88,7 +98,7 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
       final author = widget.videoInfo.author;
       final title = widget.videoInfo.title;
       final uid = widget.videoInfo.uid;
-      final album = await _downloadService.buildAlbumPath(_albumName, author);
+      final album = await _downloadService.buildAlbumPath(_albumName, author, uid);
       final fileName = _downloadService.buildFileName('cover', 'jpg', author, title, uid);
       await _downloadService.downloadFile(widget.videoInfo.cover, fileName, album, null);
       if (mounted) _showSnack('封面已保存到相册');
@@ -98,8 +108,15 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
   }
 
   void _showSnack(String msg) {
+    final clean = msg.replaceAll('Exception: ', '');
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating),
+      SnackBar(
+        content: Text(clean),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: clean.contains('成功') || clean.contains('已保存')
+            ? Colors.green[700]
+            : null,
+      ),
     );
   }
 

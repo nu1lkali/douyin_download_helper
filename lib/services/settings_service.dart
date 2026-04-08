@@ -9,6 +9,7 @@ class SettingsService {
   static const _keyCookie = 'douyin_cookie';
   static const _keyFloatingCompact = 'floating_compact_mode';
   static const _keyGroupByAuthor = 'group_by_author';
+  static const _keyCompactAutoClose = 'compact_auto_close';
 
   static Future<bool> getFloatingWindowEnabled() async {
     final prefs = await SharedPreferences.getInstance();
@@ -69,5 +70,15 @@ class SettingsService {
   static Future<void> setGroupByAuthor(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyGroupByAuthor, value);
+  }
+
+  static Future<bool> getCompactAutoClose() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_keyCompactAutoClose) ?? true;
+  }
+
+  static Future<void> setCompactAutoClose(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyCompactAutoClose, value);
   }
 }

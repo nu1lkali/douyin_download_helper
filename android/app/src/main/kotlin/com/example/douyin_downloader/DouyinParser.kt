@@ -116,7 +116,11 @@ object DouyinParser {
             val playAddr = video.optJSONObject("play_addr")
             val urlList = playAddr?.optJSONArray("url_list")
             if (urlList != null && urlList.length() > 0) {
-                videoUrl = urlList.getString(0).replace("playwm", "play")
+                videoUrl = urlList.getString(0)
+                    .replace("playwm", "play")
+                    .replace("ratio=720p", "ratio=1080p")
+                    .replace("ratio=540p", "ratio=1080p")
+                    .replace("ratio=480p", "ratio=1080p")
             }
             if (videoUrl.isEmpty()) {
                 val uri = playAddr?.optString("uri", "") ?: ""
