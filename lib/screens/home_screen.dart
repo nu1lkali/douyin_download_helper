@@ -37,7 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _restoreFloatingWindow() async {
     final enabled = await SettingsService.getFloatingWindowEnabled();
     if (enabled && await FloatingWindowService.hasOverlayPermission()) {
-      FloatingWindowService.start();
+      final compact = await SettingsService.getFloatingCompactMode();
+      FloatingWindowService.start(compactMode: compact);
     }
   }
 

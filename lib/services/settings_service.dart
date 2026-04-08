@@ -7,6 +7,7 @@ class SettingsService {
   static const _keyAlbumName = 'album_name';
   static const _keyParseMode = 'parse_mode';
   static const _keyCookie = 'douyin_cookie';
+  static const _keyFloatingCompact = 'floating_compact_mode';
 
   static Future<bool> getFloatingWindowEnabled() async {
     final prefs = await SharedPreferences.getInstance();
@@ -47,5 +48,15 @@ class SettingsService {
   static Future<void> setCookie(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyCookie, value.trim());
+  }
+
+  static Future<bool> getFloatingCompactMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_keyFloatingCompact) ?? false;
+  }
+
+  static Future<void> setFloatingCompactMode(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyFloatingCompact, value);
   }
 }

@@ -11,6 +11,8 @@ com.example.douyin_downloader.app-packageReleaseResources-9 C:\Users\FoxOS_User\
 com.example.douyin_downloader.app-merged-not-compiled-resources-10 C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\app\intermediates\merged-not-compiled-resources\release
 com.example.douyin_downloader.app-merged_res-11 C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\app\intermediates\merged_res\release
 com.example.douyin_downloader.app-packaged_res-12 C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\device_info_plus\intermediates\packaged_res\release
-com.example.douyin_downloader.app-packaged_res-13 C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\path_provider_android\intermediates\packaged_res\release
-com.example.douyin_downloader.app-packaged_res-14 C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\permission_handler_android\intermediates\packaged_res\release
-com.example.douyin_downloader.app-packaged_res-15 C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\shared_preferences_android\intermediates\packaged_res\release
+com.example.douyin_downloader.app-packaged_res-13 C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\file_picker\intermediates\packaged_res\release
+com.example.douyin_downloader.app-packaged_res-14 C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\flutter_plugin_android_lifecycle\intermediates\packaged_res\release
+com.example.douyin_downloader.app-packaged_res-15 C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\path_provider_android\intermediates\packaged_res\release
+com.example.douyin_downloader.app-packaged_res-16 C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\permission_handler_android\intermediates\packaged_res\release
+com.example.douyin_downloader.app-packaged_res-17 C:\Users\FoxOS_User\Desktop\project\douyin_download_helper\build\shared_preferences_android\intermediates\packaged_res\release

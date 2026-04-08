@@ -5,28 +5,32 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.*
+import android.os.Handler
 import android.os.IBinder
-import android.view.Gravity
-import android.view.MotionEvent
-import android.view.View
-import android.view.WindowManager
-import android.widget.ImageView
+import android.os.Looper
+import android.view.*
+import android.widget.*
+import androidx.core.content.ContextCompat
 
 class FloatingWindowService : Service() {
 
     private lateinit var windowManager: WindowManager
     private lateinit var floatingView: View
+    private var compactPanel: View? = null
+    private var compactParams: WindowManager.LayoutParams? = null
+    private var isCompactMode = false
 
     override fun onBind(intent: Intent?): IBinder? = null
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        isCompactMode = intent?.getBooleanExtra("compact_mode", false) ?: false
+        return START_STICKY
+    }
 
     override fun onCreate() {
         super.onCreate()
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
-        floatingView = ImageView(this).apply {
-            setImageResource(R.drawable.float_icon)
-            scaleType = ImageView.ScaleType.FIT_CENTER
-            setPadding(8, 8, 8, 8)
-        }
+        floatingView = DouyinFloatButton(this)
 
         val params = WindowManager.LayoutParams(
             140, 140,
@@ -59,12 +63,18 @@ class FloatingWindowService : Service() {
                 }
                 MotionEvent.ACTION_UP -> {
                     if (!moved) {
-                        // 不在Service里读剪贴板（Android 10+后台读取会被拦截）
-                        // 直接启动MainActivity，由前台Activity自己读剪贴板
-                        startActivity(Intent(this, MainActivity::class.java).apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                            putExtra("read_clipboard", true)
-                        })
+                        if (isCompactMode) {
+                            // 简洁模式：读取剪贴板，弹出悬浮面板
+                            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                            val clipText = clipboard.primaryClip?.getItemAt(0)?.text?.toString() ?: ""
+                            showCompactPanel(clipText)
+                        } else {
+                            // 普通模式：跳转 MainActivity
+                            startActivity(Intent(this, MainActivity::class.java).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                                putExtra("read_clipboard", true)
+                            })
+                        }
                     }
                 }
             }
@@ -74,61 +84,180 @@ class FloatingWindowService : Service() {
         windowManager.addView(floatingView, params)
     }
 
+    private fun showCompactPanel(clipText: String) {
+        // 如果已有面板，先移除
+        dismissCompactPanel()
+
+        val panel = LayoutInflater.from(this).inflate(R.layout.floating_compact_panel, null)
+        val wm = windowManager
+
+        val p = WindowManager.LayoutParams(
+            (resources.displayMetrics.widthPixels * 0.88).toInt(),
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+                    WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
+            PixelFormat.TRANSLUCENT
+        ).apply {
+            gravity = Gravity.CENTER
+        }
+
+        compactPanel = panel
+        compactParams = p
+
+        // 关闭按钮
+        panel.findViewById<ImageButton>(R.id.btn_close).setOnClickListener {
+            dismissCompactPanel()
+        }
+
+        val tvStatus = panel.findViewById<TextView>(R.id.tv_status)
+        val tvTitle = panel.findViewById<TextView>(R.id.tv_title)
+        val tvAuthor = panel.findViewById<TextView>(R.id.tv_author)
+        val btnDownloadVideo = panel.findViewById<Button>(R.id.btn_download_video)
+        val btnDownloadImages = panel.findViewById<Button>(R.id.btn_download_images)
+        val progressBar = panel.findViewById<ProgressBar>(R.id.progress_bar)
+
+        tvStatus.text = "正在解析..."
+        progressBar.visibility = View.VISIBLE
+        btnDownloadVideo.visibility = View.GONE
+        btnDownloadImages.visibility = View.GONE
+
+        wm.addView(panel, p)
+
+        // 通知 Flutter 解析
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra("compact_parse", clipText)
+        }
+
+        // 通过广播通知 Flutter 解析，结果回调到面板
+        CompactPanelManager.setCallback { result ->
+            Handler(Looper.getMainLooper()).post {
+                progressBar.visibility = View.GONE
+                if (result.isSuccess) {
+                    val info = result.getOrNull()!!
+                    tvStatus.text = "解析成功"
+                    tvTitle.text = info.title
+                    tvAuthor.text = info.author
+                    tvTitle.visibility = View.VISIBLE
+                    tvAuthor.visibility = View.VISIBLE
+
+                    if (info.isVideo) {
+                        btnDownloadVideo.visibility = View.VISIBLE
+                        btnDownloadVideo.setOnClickListener {
+                            btnDownloadVideo.isEnabled = false
+                            btnDownloadVideo.text = "下载中..."
+                            notifyFlutterDownload(info.videoUrl, info.albumName, false)
+                        }
+                    } else {
+                        btnDownloadImages.visibility = View.VISIBLE
+                        btnDownloadImages.text = "下载全部图片(${info.imageCount}张)"
+                        btnDownloadImages.setOnClickListener {
+                            btnDownloadImages.isEnabled = false
+                            btnDownloadImages.text = "下载中..."
+                            notifyFlutterDownload(info.videoUrl, info.albumName, true)
+                        }
+                    }
+                } else {
+                    tvStatus.text = "解析失败: ${result.exceptionOrNull()?.message}"
+                }
+            }
+        }
+
+        // 启动解析
+        startActivity(intent)
+    }
+
+    private fun notifyFlutterDownload(url: String, albumName: String, isImages: Boolean) {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra("compact_download", url)
+            putExtra("compact_album", albumName)
+            putExtra("compact_is_images", isImages)
+        }
+        startActivity(intent)
+
+        CompactPanelManager.setDownloadCallback {
+            Handler(Looper.getMainLooper()).post {
+                compactPanel?.let { panel ->
+                    panel.findViewById<Button>(R.id.btn_download_video)?.text = "下载完成 ✓"
+                    panel.findViewById<Button>(R.id.btn_download_images)?.text = "下载完成 ✓"
+                }
+            }
+        }
+    }
+
+    fun dismissCompactPanel() {
+        compactPanel?.let {
+            try { windowManager.removeView(it) } catch (_: Exception) {}
+            compactPanel = null
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        if (::floatingView.isInitialized) windowManager.removeView(floatingView)
+        dismissCompactPanel()
+        if (::floatingView.isInitialized) {
+            try { windowManager.removeView(floatingView) } catch (_: Exception) {}
+        }
     }
 }
 
-/** 用Canvas自绘的抖音风格悬浮按钮 */
-class DouyinFloatButton(context: Context) : View(context) {
+// 简单的回调管理器
+object CompactPanelManager {
+    data class ParseResult(
+        val title: String,
+        val author: String,
+        val videoUrl: String,
+        val albumName: String,
+        val isVideo: Boolean,
+        val imageCount: Int,
+    )
 
+    private var parseCallback: ((Result<ParseResult>) -> Unit)? = null
+    private var downloadCallback: (() -> Unit)? = null
+
+    fun setCallback(cb: (Result<ParseResult>) -> Unit) { parseCallback = cb }
+    fun setDownloadCallback(cb: () -> Unit) { downloadCallback = cb }
+
+    fun onParseResult(result: Result<ParseResult>) {
+        parseCallback?.invoke(result)
+        parseCallback = null
+    }
+
+    fun onDownloadDone() {
+        downloadCallback?.invoke()
+        downloadCallback = null
+    }
+}
+
+/** 悬浮按钮自绘 */
+class DouyinFloatButton(context: Context) : View(context) {
     private val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#FF2442")
+        color = Color.parseColor("#1677FF")
         style = Paint.Style.FILL
     }
     private val shadowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#44FF2442")
+        color = Color.parseColor("#441677FF")
         style = Paint.Style.FILL
         maskFilter = BlurMaskFilter(18f, BlurMaskFilter.Blur.NORMAL)
     }
     private val iconPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.WHITE
-        style = Paint.Style.FILL
+        style = Paint.Style.STROKE
+        strokeCap = Paint.Cap.ROUND
     }
-    private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.WHITE
-        textSize = 22f
-        textAlign = Paint.Align.CENTER
-        typeface = Typeface.DEFAULT_BOLD
-    }
-
-    // 下载箭头路径
-    private val arrowPath = Path()
 
     override fun onDraw(canvas: Canvas) {
-        val cx = width / 2f
-        val cy = height / 2f
+        val cx = width / 2f; val cy = height / 2f
         val r = minOf(width, height) / 2f - 8f
-
-        // 阴影
         canvas.drawCircle(cx, cy + 4f, r, shadowPaint)
-        // 主圆
         canvas.drawCircle(cx, cy, r, bgPaint)
-
-        // 绘制下载图标（向下箭头 + 横线）
-        val iconSize = r * 0.45f
+        val s = r * 0.45f
         iconPaint.strokeWidth = r * 0.13f
-        iconPaint.style = Paint.Style.STROKE
-        iconPaint.strokeCap = Paint.Cap.ROUND
-
-        // 竖线
-        canvas.drawLine(cx, cy - iconSize * 0.8f, cx, cy + iconSize * 0.3f, iconPaint)
-        // 箭头
-        canvas.drawLine(cx, cy + iconSize * 0.3f, cx - iconSize * 0.55f, cy - iconSize * 0.2f, iconPaint)
-        canvas.drawLine(cx, cy + iconSize * 0.3f, cx + iconSize * 0.55f, cy - iconSize * 0.2f, iconPaint)
-        // 底部横线
-        iconPaint.strokeCap = Paint.Cap.ROUND
-        canvas.drawLine(cx - iconSize * 0.7f, cy + iconSize * 0.75f, cx + iconSize * 0.7f, cy + iconSize * 0.75f, iconPaint)
+        canvas.drawLine(cx, cy - s * 0.8f, cx, cy + s * 0.3f, iconPaint)
+        canvas.drawLine(cx, cy + s * 0.3f, cx - s * 0.55f, cy - s * 0.2f, iconPaint)
+        canvas.drawLine(cx, cy + s * 0.3f, cx + s * 0.55f, cy - s * 0.2f, iconPaint)
+        canvas.drawLine(cx - s * 0.7f, cy + s * 0.75f, cx + s * 0.7f, cy + s * 0.75f, iconPaint)
     }
 }

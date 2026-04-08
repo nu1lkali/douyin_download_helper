@@ -14,6 +14,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObserver {
   bool _floatingEnabled = false;
   bool _hasOverlayPermission = false;
+  bool _floatingCompact = false;
   final _albumController = TextEditingController();
   final _cookieController = TextEditingController();
   ParseMode _parseMode = ParseMode.remote;
@@ -46,12 +47,14 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
     final albumName = await SettingsService.getAlbumName();
     final mode = await SettingsService.getParseMode();
     final cookie = await SettingsService.getCookie();
+    final compact = await SettingsService.getFloatingCompactMode();
     await _checkPermission();
     setState(() {
       _floatingEnabled = enabled;
       _albumController.text = albumName;
       _parseMode = mode;
       _cookieController.text = cookie;
+      _floatingCompact = compact;
     });
   }
 
@@ -67,7 +70,7 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
     }
     await SettingsService.setFloatingWindowEnabled(value);
     if (value) {
-      await FloatingWindowService.start();
+      await FloatingWindowService.start(compactMode: _floatingCompact);
     } else {
       await FloatingWindowService.stop();
     }
@@ -327,6 +330,27 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
                 value: _floatingEnabled,
                 activeColor: _primary,
                 onChanged: _toggleFloating,
+              ),
+              const Divider(height: 1, indent: 16, endIndent: 16),
+              SwitchListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                title: const Text('简洁模式', style: TextStyle(fontWeight: FontWeight.w500)),
+                subtitle: Text(
+                  '点击悬浮窗弹出小面板，不打断当前应用',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                ),
+                value: _floatingCompact,
+                activeColor: _primary,
+                onChanged: (v) async {
+                  await SettingsService.setFloatingCompactMode(v);
+                  setState(() => _floatingCompact = v);
+                  // 如果悬浮窗已启用，重启以应用新模式
+                  if (_floatingEnabled && _hasOverlayPermission) {
+                    await FloatingWindowService.stop();
+                    await Future.delayed(const Duration(milliseconds: 300));
+                    await FloatingWindowService.start(compactMode: v);
+                  }
+                },
               ),
               if (!_hasOverlayPermission) ...[
                 const Divider(height: 1, indent: 16, endIndent: 16),

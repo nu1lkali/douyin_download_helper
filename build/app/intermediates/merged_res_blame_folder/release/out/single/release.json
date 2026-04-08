@@ -1,11 +1,19 @@
 [
     {
+        "merged": "C:\\Users\\FoxOS_User\\.gradle\\daemon\\8.5\\com.example.douyin_downloader.app-merged_res-11:\\drawable_panel_bg.xml.flat",
+        "source": "C:\\Users\\FoxOS_User\\.gradle\\daemon\\8.5\\com.example.douyin_downloader.app-main-4:\\drawable\\panel_bg.xml"
+    },
+    {
         "merged": "C:\\Users\\FoxOS_User\\.gradle\\daemon\\8.5\\com.example.douyin_downloader.app-merged_res-11:\\mipmap-mdpi_ic_launcher.png.flat",
         "source": "C:\\Users\\FoxOS_User\\.gradle\\daemon\\8.5\\com.example.douyin_downloader.app-main-4:\\mipmap-mdpi\\ic_launcher.png"
     },
     {
         "merged": "C:\\Users\\FoxOS_User\\.gradle\\daemon\\8.5\\com.example.douyin_downloader.app-merged_res-11:\\layout_custom_dialog.xml.flat",
         "source": "C:\\Users\\FoxOS_User\\.gradle\\daemon\\8.5\\com.example.douyin_downloader.app-core-1.6.0-3:\\layout\\custom_dialog.xml"
+    },
+    {
+        "merged": "com.example.douyin_downloader.app-merged_res-11:/layout_floating_compact_panel.xml.flat",
+        "source": "com.example.douyin_downloader.app-main-4:/layout/floating_compact_panel.xml"
     },
     {
         "merged": "C:\\Users\\FoxOS_User\\.gradle\\daemon\\8.5\\com.example.douyin_downloader.app-merged_res-11:\\drawable-hdpi-v4_notification_bg_low_normal.9.png.flat",
@@ -130,5 +138,9 @@
     {
         "merged": "C:\\Users\\FoxOS_User\\.gradle\\daemon\\8.5\\com.example.douyin_downloader.app-merged_res-11:\\drawable-mdpi-v4_notify_panel_notification_icon_bg.png.flat",
         "source": "C:\\Users\\FoxOS_User\\.gradle\\daemon\\8.5\\com.example.douyin_downloader.app-core-1.6.0-3:\\drawable-mdpi-v4\\notify_panel_notification_icon_bg.png"
+    },
+    {
+        "merged": "C:\\Users\\FoxOS_User\\.gradle\\daemon\\8.5\\com.example.douyin_downloader.app-merged_res-11:\\layout_floating_compact_panel.xml.flat",
+        "source": "C:\\Users\\FoxOS_User\\.gradle\\daemon\\8.5\\com.example.douyin_downloader.app-main-4:\\layout\\floating_compact_panel.xml"
     }
 ]
