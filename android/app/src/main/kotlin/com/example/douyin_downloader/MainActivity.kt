@@ -61,25 +61,10 @@ class MainActivity : FlutterActivity() {
                     }
                 }
                 "compactParseResult" -> {
-                    val success = call.argument<Boolean>("success") ?: false
-                    if (success) {
-                        val parseResult = CompactPanelManager.ParseResult(
-                            title = call.argument<String>("title") ?: "",
-                            author = call.argument<String>("author") ?: "",
-                            videoUrl = call.argument<String>("videoUrl") ?: "",
-                            albumName = call.argument<String>("albumName") ?: "便捷下载",
-                            isVideo = call.argument<Boolean>("isVideo") ?: true,
-                            imageCount = call.argument<Int>("imageCount") ?: 0,
-                        )
-                        CompactPanelManager.onParseResult(Result.success(parseResult))
-                    } else {
-                        val error = call.argument<String>("error") ?: "解析失败"
-                        CompactPanelManager.onParseResult(Result.failure(Exception(error)))
-                    }
+                    // 简洁模式现在完全在 Service 里处理，此方法保留兼容
                     result.success(null)
                 }
                 "compactDownloadDone" -> {
-                    CompactPanelManager.onDownloadDone()
                     result.success(null)
                 }
                 else -> result.notImplemented()
