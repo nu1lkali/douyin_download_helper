@@ -41,6 +41,9 @@ Thumbs.db
 Douyin_TikTok_Download_API/crawlers/douyin/web/config.yaml
 cookie.txt
 
+# ── Kiro IDE ──
+.kiro/
+
 # ── Python ──
 __pycache__/
 **/__pycache__/
