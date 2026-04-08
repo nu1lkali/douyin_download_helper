@@ -155,7 +155,8 @@ class FloatingWindowService : Service() {
                                 btnVideo.isEnabled = false
                                 btnVideo.text = "下载中..."
                                 val fileName = DouyinParser.buildFileName("video", "mp4", result.title, result.author, result.shortId)
-                                downloadInBackground(result.videoUrl, false, result.albumName, fileName) { ok, msg ->
+                                val album = buildAlbumPath(result.author, result.shortId)
+                                downloadInBackground(result.videoUrl, false, album, fileName) { ok, msg ->
                                     mainHandler.post {
                                         btnVideo.text = if (ok) "✓ 已保存到相册" else "下载失败: $msg"
                                         if (ok) scheduleAutoClose()
@@ -171,7 +172,8 @@ class FloatingWindowService : Service() {
                                 var done = 0
                                 result.images.forEachIndexed { i, url ->
                                     val fileName = DouyinParser.buildFileName("img_$i", "jpg", result.title, result.author, result.shortId)
-                                    downloadInBackground(url, true, result.albumName, fileName) { ok, _ ->
+                                    val album = buildAlbumPath(result.author, result.shortId)
+                                    downloadInBackground(url, true, album, fileName) { ok, _ ->
                                         done++
                                         if (done == result.images.size) {
                                             mainHandler.post {
@@ -192,6 +194,20 @@ class FloatingWindowService : Service() {
                 }
             }.start()
         }, 200) // 等200ms让窗口获得焦点
+    }
+
+    /** 读取设置，构建完整相册路径（含分组子目录） */
+    private fun buildAlbumPath(author: String, shortId: String): String {
+        val prefs = getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
+        val albumName = prefs.getString("flutter.album_name", "便捷下载") ?: "便捷下载"
+        val groupByAuthor = prefs.getBoolean("flutter.group_by_author", false)
+        if (groupByAuthor && author.isNotEmpty()) {
+            val folderName = if (shortId.isNotEmpty()) "$author($shortId)" else author
+            // 清理非法字符，保留括号
+            val safeFolder = folderName.replace(Regex("[*?\"<>|\\\\/:]+"), "_")
+            return "$albumName/$safeFolder"
+        }
+        return albumName
     }
 
     private fun downloadInBackground(
