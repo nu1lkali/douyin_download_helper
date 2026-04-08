@@ -119,6 +119,8 @@ class FloatingWindowService : Service() {
         val btnVideo = panel.findViewById<Button>(R.id.btn_download_video)
         val btnImages = panel.findViewById<Button>(R.id.btn_download_images)
         val progress = panel.findViewById<ProgressBar>(R.id.progress_bar)
+        val progressDownload = panel.findViewById<ProgressBar>(R.id.progress_download)
+        val tvDownloadProgress = panel.findViewById<TextView>(R.id.tv_download_progress)
 
         panel.findViewById<ImageButton>(R.id.btn_close).setOnClickListener { dismissCompactPanel() }
 
@@ -156,8 +158,26 @@ class FloatingWindowService : Service() {
                                 btnVideo.text = "下载中..."
                                 val fileName = DouyinParser.buildFileName("video", "mp4", result.title, result.author, result.shortId)
                                 val album = buildAlbumPath(result.author, result.shortId)
-                                downloadInBackground(result.videoUrl, false, album, fileName) { ok, msg ->
+                                btnVideo.isEnabled = false
+                                btnVideo.text = "下载中..."
+                                progressDownload.visibility = View.VISIBLE
+                                progressDownload.progress = 0
+                                tvDownloadProgress.visibility = View.VISIBLE
+                                tvDownloadProgress.text = "0%"
+                                downloadInBackground(result.videoUrl, false, album, fileName,
+                                    onProgress = { downloaded, total ->
+                                        if (total > 0) {
+                                            val pct = (downloaded * 100 / total).toInt()
+                                            mainHandler.post {
+                                                progressDownload.progress = pct
+                                                tvDownloadProgress.text = "$pct%"
+                                            }
+                                        }
+                                    }
+                                ) { ok, msg ->
                                     mainHandler.post {
+                                        progressDownload.visibility = View.GONE
+                                        tvDownloadProgress.visibility = View.GONE
                                         btnVideo.text = if (ok) "✓ 已保存到相册" else "下载失败: $msg"
                                         if (ok) scheduleAutoClose()
                                     }
@@ -169,16 +189,33 @@ class FloatingWindowService : Service() {
                             btnImages.setOnClickListener {
                                 btnImages.isEnabled = false
                                 btnImages.text = "下载中..."
+                                progressDownload.visibility = View.VISIBLE
+                                progressDownload.progress = 0
+                                tvDownloadProgress.visibility = View.VISIBLE
+                                tvDownloadProgress.text = "0/${result.images.size}"
                                 var done = 0
                                 result.images.forEachIndexed { i, url ->
                                     val fileName = DouyinParser.buildFileName("img_$i", "jpg", result.title, result.author, result.shortId)
                                     val album = buildAlbumPath(result.author, result.shortId)
-                                    downloadInBackground(url, true, album, fileName) { ok, _ ->
+                                    downloadInBackground(url, true, album, fileName,
+                                        onProgress = { downloaded, total ->
+                                            if (total > 0) {
+                                                val filePct = (downloaded * 100 / total).toInt()
+                                                val totalPct = ((i * 100 + filePct) / result.images.size)
+                                                mainHandler.post {
+                                                    progressDownload.progress = totalPct
+                                                    tvDownloadProgress.text = "${i + 1}/${result.images.size}  $totalPct%"
+                                                }
+                                            }
+                                        }
+                                    ) { ok, _ ->
                                         done++
                                         if (done == result.images.size) {
                                             mainHandler.post {
+                                                progressDownload.visibility = View.GONE
+                                                tvDownloadProgress.visibility = View.GONE
                                                 btnImages.text = "✓ ${result.images.size}张已保存到相册"
-                                                if (ok) scheduleAutoClose()
+                                                scheduleAutoClose()
                                             }
                                         }
                                     }
@@ -212,22 +249,22 @@ class FloatingWindowService : Service() {
 
     private fun downloadInBackground(
         url: String, isImage: Boolean, albumName: String, fileName: String,
+        onProgress: ((Long, Long) -> Unit)? = null,
         callback: (Boolean, String?) -> Unit
     ) {
         Thread {
             try {
                 val tmpFile = File(cacheDir, fileName)
-                downloadUrl(url, tmpFile)
+                downloadUrl(url, tmpFile, onProgress)
                 saveToGallery(tmpFile.absolutePath, albumName, fileName)
                 tmpFile.delete()
                 callback(true, null)
             } catch (e: Exception) {
-                // 1080p 失败降级到 720p
                 if (url.contains("ratio=1080p")) {
                     try {
                         val fallbackUrl = url.replace("ratio=1080p", "ratio=720p")
                         val tmpFile = File(cacheDir, fileName)
-                        downloadUrl(fallbackUrl, tmpFile)
+                        downloadUrl(fallbackUrl, tmpFile, onProgress)
                         saveToGallery(tmpFile.absolutePath, albumName, fileName)
                         tmpFile.delete()
                         callback(true, null)
@@ -241,15 +278,25 @@ class FloatingWindowService : Service() {
         }.start()
     }
 
-    private fun downloadUrl(url: String, dest: File) {
+    private fun downloadUrl(url: String, dest: File, onProgress: ((Long, Long) -> Unit)? = null) {
         val conn = URL(url).openConnection() as HttpURLConnection
         conn.setRequestProperty("User-Agent", DouyinParser.UA)
         conn.connectTimeout = 30000
         conn.readTimeout = 60000
         conn.connect()
         if (conn.responseCode !in 200..299) throw Exception("HTTP ${conn.responseCode}")
+        val total = conn.contentLengthLong
+        var downloaded = 0L
         FileOutputStream(dest).use { out ->
-            conn.inputStream.use { it.copyTo(out) }
+            conn.inputStream.use { input ->
+                val buf = ByteArray(8192)
+                var n: Int
+                while (input.read(buf).also { n = it } != -1) {
+                    out.write(buf, 0, n)
+                    downloaded += n
+                    onProgress?.invoke(downloaded, total)
+                }
+            }
         }
         conn.disconnect()
     }

@@ -81,6 +81,29 @@
         android:text="下载视频"
         android:textColor="#FFFFFF"
         android:backgroundTint="#1677FF"
+        android:layout_marginBottom="4dp"
+        android:visibility="gone" />
+
+    <!-- 下载进度条 -->
+    <ProgressBar
+        android:id="@+id/progress_download"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:layout_marginBottom="4dp"
+        android:max="100"
+        android:progress="0"
+        android:progressTint="#1677FF"
+        android:visibility="gone" />
+
+    <!-- 下载进度文字 -->
+    <TextView
+        android:id="@+id/tv_download_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="11sp"
+        android:textColor="#999999"
+        android:gravity="center"
         android:layout_marginBottom="8dp"
         android:visibility="gone" />
 
