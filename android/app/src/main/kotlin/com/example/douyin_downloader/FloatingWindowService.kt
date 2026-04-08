@@ -241,19 +241,21 @@ class FloatingWindowService : Service() {
     private fun saveToGallery(filePath: String, albumName: String, fileName: String) {
         val file = File(filePath)
         val isVideo = fileName.endsWith(".mp4")
+        val safePath = albumName.replace(Regex("[*?\"<>|]"), "_")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val collection = if (isVideo)
                 MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
             else
                 MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+            val baseDir = if (isVideo) Environment.DIRECTORY_MOVIES else Environment.DIRECTORY_PICTURES
             val values = ContentValues().apply {
                 put(if (isVideo) MediaStore.Video.Media.DISPLAY_NAME else MediaStore.Images.Media.DISPLAY_NAME, fileName)
                 put(if (isVideo) MediaStore.Video.Media.MIME_TYPE else MediaStore.Images.Media.MIME_TYPE, if (isVideo) "video/mp4" else "image/jpeg")
-                put(if (isVideo) MediaStore.Video.Media.RELATIVE_PATH else MediaStore.Images.Media.RELATIVE_PATH,
-                    "${if (isVideo) Environment.DIRECTORY_MOVIES else Environment.DIRECTORY_PICTURES}/$albumName")
+                put(if (isVideo) MediaStore.Video.Media.RELATIVE_PATH else MediaStore.Images.Media.RELATIVE_PATH, "$baseDir/$safePath")
                 put(if (isVideo) MediaStore.Video.Media.IS_PENDING else MediaStore.Images.Media.IS_PENDING, 1)
             }
-            val uri = contentResolver.insert(collection, values)!!
+            val uri = contentResolver.insert(collection, values)
+                ?: throw Exception("MediaStore insert 失败")
             contentResolver.openOutputStream(uri)?.use { out ->
                 file.inputStream().use { it.copyTo(out) }
             }
@@ -262,7 +264,7 @@ class FloatingWindowService : Service() {
             contentResolver.update(uri, values, null, null)
         } else {
             val dir = File(Environment.getExternalStoragePublicDirectory(
-                if (isVideo) Environment.DIRECTORY_MOVIES else Environment.DIRECTORY_PICTURES), albumName)
+                if (isVideo) Environment.DIRECTORY_MOVIES else Environment.DIRECTORY_PICTURES), safePath)
             if (!dir.exists()) dir.mkdirs()
             file.copyTo(File(dir, fileName), overwrite = true)
         }

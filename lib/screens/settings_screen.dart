@@ -544,7 +544,7 @@ class _GroupByAuthorSwitchState extends State<_GroupByAuthorSwitch> {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16),
       title: const Text('按发布者分组', style: TextStyle(fontWeight: FontWeight.w500)),
       subtitle: Text(
-        '开启后保存到 相册名/发布者名 子文件夹，文件名也会带上发布者',
+        '开启后保存到 相册名/发布者名称 子文件夹，文件名也会带上发布者',
         style: TextStyle(fontSize: 12, color: Colors.grey[500]),
       ),
       value: _value,

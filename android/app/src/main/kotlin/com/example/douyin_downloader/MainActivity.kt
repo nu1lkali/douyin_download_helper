@@ -76,6 +76,8 @@ class MainActivity : FlutterActivity() {
         val file = File(filePath)
         val isVideo = fileName.endsWith(".mp4")
         val mimeType = if (isVideo) "video/mp4" else "image/jpeg"
+        // 清理路径中 MediaStore 不支持的字符，保留斜杠（子目录分隔符）
+        val safePath = albumName.replace(Regex("[*?\"<>|]"), "_")
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val collection = if (isVideo)
@@ -83,15 +85,18 @@ class MainActivity : FlutterActivity() {
             else
                 MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
 
+            val baseDir = if (isVideo) Environment.DIRECTORY_MOVIES else Environment.DIRECTORY_PICTURES
+            val relativePath = "$baseDir/$safePath"
+
             val values = ContentValues().apply {
                 put(if (isVideo) MediaStore.Video.Media.DISPLAY_NAME else MediaStore.Images.Media.DISPLAY_NAME, fileName)
                 put(if (isVideo) MediaStore.Video.Media.MIME_TYPE else MediaStore.Images.Media.MIME_TYPE, mimeType)
-                put(if (isVideo) MediaStore.Video.Media.RELATIVE_PATH else MediaStore.Images.Media.RELATIVE_PATH,
-                    "${if (isVideo) Environment.DIRECTORY_MOVIES else Environment.DIRECTORY_PICTURES}/$albumName")
+                put(if (isVideo) MediaStore.Video.Media.RELATIVE_PATH else MediaStore.Images.Media.RELATIVE_PATH, relativePath)
                 put(if (isVideo) MediaStore.Video.Media.IS_PENDING else MediaStore.Images.Media.IS_PENDING, 1)
             }
 
-            val uri = contentResolver.insert(collection, values)!!
+            val uri = contentResolver.insert(collection, values)
+                ?: throw Exception("MediaStore insert 失败，路径: $relativePath")
             contentResolver.openOutputStream(uri)?.use { output ->
                 FileInputStream(file).use { input -> input.copyTo(output) }
             }
@@ -99,15 +104,14 @@ class MainActivity : FlutterActivity() {
             values.put(if (isVideo) MediaStore.Video.Media.IS_PENDING else MediaStore.Images.Media.IS_PENDING, 0)
             contentResolver.update(uri, values, null, null)
         } else {
-            val dir = File(
-                Environment.getExternalStoragePublicDirectory(
-                    if (isVideo) Environment.DIRECTORY_MOVIES else Environment.DIRECTORY_PICTURES
-                ), albumName
+            val baseDir = Environment.getExternalStoragePublicDirectory(
+                if (isVideo) Environment.DIRECTORY_MOVIES else Environment.DIRECTORY_PICTURES
             )
+            // Android 9 及以下：safePath 可能含斜杠，逐级创建目录
+            val dir = File(baseDir, safePath)
             if (!dir.exists()) dir.mkdirs()
             val dest = File(dir, fileName)
             file.copyTo(dest, overwrite = true)
-            // 通知媒体库扫描
             sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(dest)))
         }
     }
