@@ -153,7 +153,8 @@ class FloatingWindowService : Service() {
                             btnVideo.setOnClickListener {
                                 btnVideo.isEnabled = false
                                 btnVideo.text = "下载中..."
-                                downloadInBackground(result.videoUrl, false, result.albumName) { ok, msg ->
+                                val fileName = DouyinParser.buildFileName("video", "mp4", result.title, result.author, result.shortId)
+                                downloadInBackground(result.videoUrl, false, result.albumName, fileName) { ok, msg ->
                                     mainHandler.post {
                                         btnVideo.text = if (ok) "✓ 已保存到相册" else "下载失败: $msg"
                                     }
@@ -167,7 +168,8 @@ class FloatingWindowService : Service() {
                                 btnImages.text = "下载中..."
                                 var done = 0
                                 result.images.forEachIndexed { i, url ->
-                                    downloadInBackground(url, true, result.albumName) { ok, _ ->
+                                    val fileName = DouyinParser.buildFileName("img_$i", "jpg", result.title, result.author, result.shortId)
+                                    downloadInBackground(url, true, result.albumName, fileName) { ok, _ ->
                                         done++
                                         if (done == result.images.size) {
                                             mainHandler.post {
@@ -190,16 +192,13 @@ class FloatingWindowService : Service() {
     }
 
     private fun downloadInBackground(
-        url: String, isImage: Boolean, albumName: String,
+        url: String, isImage: Boolean, albumName: String, fileName: String,
         callback: (Boolean, String?) -> Unit
     ) {
         Thread {
             try {
-                val ext = if (isImage) "jpg" else "mp4"
-                val fileName = "${if (isImage) "img" else "video"}_${System.currentTimeMillis()}.$ext"
                 val tmpFile = File(cacheDir, fileName)
 
-                // 下载到临时文件
                 val conn = URL(url).openConnection() as HttpURLConnection
                 conn.setRequestProperty("User-Agent", DouyinParser.UA)
                 conn.connect()
@@ -208,7 +207,6 @@ class FloatingWindowService : Service() {
                 }
                 conn.disconnect()
 
-                // 保存到相册
                 saveToGallery(tmpFile.absolutePath, albumName, fileName)
                 tmpFile.delete()
                 callback(true, null)

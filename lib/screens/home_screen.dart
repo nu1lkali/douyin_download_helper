@@ -28,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
     FloatingWindowService.setClipboardHandler((text) {
       if (mounted) {
         setState(() => _controller.text = text);
-        _parseVideo();
+        _parseVideo(replaceRoute: true);
       }
     });
     _restoreFloatingWindow();
@@ -65,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return true;
   }
 
-  Future<void> _parseVideo() async {
+  Future<void> _parseVideo({bool replaceRoute = false}) async {
     final text = _controller.text.trim();
     final link = LinkExtractor.extractLink(text);
     if (link == null) {
@@ -76,9 +76,18 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final videoInfo = await ApiService.parseVideo(link);
       if (mounted) {
-        Navigator.push(context, MaterialPageRoute(
+        final route = MaterialPageRoute(
           builder: (_) => VideoDetailScreen(videoInfo: videoInfo),
-        ));
+        );
+        if (replaceRoute) {
+          // 悬浮窗触发：替换当前详情页，不叠加
+          Navigator.pushAndRemoveUntil(
+            context, route,
+            (r) => r.isFirst, // 保留首页，移除所有详情页
+          );
+        } else {
+          Navigator.push(context, route);
+        }
       }
     } catch (e) {
       _showError(e.toString().replaceAll('Exception: ', ''));

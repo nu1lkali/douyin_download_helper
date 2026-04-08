@@ -34,13 +34,13 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
   Future<void> _downloadVideo() async {
     setState(() { _isDownloading = true; _progress = 0; });
     try {
-      final fileName = 'video_${DateTime.now().millisecondsSinceEpoch}.mp4';
-      await _downloadService.downloadFile(
-        widget.videoInfo.url, fileName, _albumName,
-        (received, total) {
-          if (total > 0) setState(() => _progress = received / total);
-        },
-      );
+      final author = widget.videoInfo.author;
+      final title = widget.videoInfo.title;
+      final uid = widget.videoInfo.uid;
+      final album = await _downloadService.buildAlbumPath(_albumName, author);
+      final fileName = _downloadService.buildFileName('video', 'mp4', author, title, uid);
+      await _downloadService.downloadFile(widget.videoInfo.url, fileName, album,
+        (received, total) { if (total > 0) setState(() => _progress = received / total); });
       if (mounted) _showSnack('视频已保存到相册');
     } catch (e) {
       if (mounted) _showSnack(e.toString());
@@ -52,9 +52,13 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
   Future<void> _downloadAllImages() async {
     setState(() { _isDownloading = true; _progress = 0; });
     try {
+      final author = widget.videoInfo.author;
+      final title = widget.videoInfo.title;
+      final uid = widget.videoInfo.uid;
+      final album = await _downloadService.buildAlbumPath(_albumName, author);
       for (int i = 0; i < imageList.length; i++) {
-        final fileName = 'img_${DateTime.now().millisecondsSinceEpoch}_$i.jpg';
-        await _downloadService.downloadFile(imageList[i], fileName, _albumName, null);
+        final fileName = _downloadService.buildFileName('img_$i', 'jpg', author, title, uid);
+        await _downloadService.downloadFile(imageList[i], fileName, album, null);
         setState(() => _progress = (i + 1) / imageList.length);
       }
       if (mounted) _showSnack('${imageList.length} 张图片已保存到相册');
@@ -67,8 +71,12 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
 
   Future<void> _downloadSingleImage(String url, int index) async {
     try {
-      final fileName = 'img_${DateTime.now().millisecondsSinceEpoch}_$index.jpg';
-      await _downloadService.downloadFile(url, fileName, _albumName, null);
+      final author = widget.videoInfo.author;
+      final title = widget.videoInfo.title;
+      final uid = widget.videoInfo.uid;
+      final album = await _downloadService.buildAlbumPath(_albumName, author);
+      final fileName = _downloadService.buildFileName('img_$index', 'jpg', author, title, uid);
+      await _downloadService.downloadFile(url, fileName, album, null);
       if (mounted) _showSnack('图片已保存到相册');
     } catch (e) {
       if (mounted) _showSnack(e.toString());
@@ -77,8 +85,12 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
 
   Future<void> _downloadCover() async {
     try {
-      final fileName = 'cover_${DateTime.now().millisecondsSinceEpoch}.jpg';
-      await _downloadService.downloadFile(widget.videoInfo.cover, fileName, _albumName, null);
+      final author = widget.videoInfo.author;
+      final title = widget.videoInfo.title;
+      final uid = widget.videoInfo.uid;
+      final album = await _downloadService.buildAlbumPath(_albumName, author);
+      final fileName = _downloadService.buildFileName('cover', 'jpg', author, title, uid);
+      await _downloadService.downloadFile(widget.videoInfo.cover, fileName, album, null);
       if (mounted) _showSnack('封面已保存到相册');
     } catch (e) {
       if (mounted) _showSnack(e.toString());

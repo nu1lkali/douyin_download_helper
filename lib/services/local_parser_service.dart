@@ -177,7 +177,11 @@ class LocalParserService {
 
     return VideoInfo(
       author: author['nickname'] as String? ?? '',
-      uid: (author['uid'] ?? '').toString(),
+      uid: _notEmpty([
+        author['short_id'],
+        author['unique_id'],
+        author['uid'],
+      ]),
       avatar: avatar,
       like: _parseInt(statistics['digg_count']),
       time: _parseInt(item['create_time']),
@@ -199,5 +203,14 @@ class LocalParserService {
     if (v == null) return 0;
     if (v is int) return v;
     return int.tryParse(v.toString()) ?? 0;
+  }
+
+  /// 取第一个非空值
+  String _notEmpty(List<dynamic> values) {
+    for (final v in values) {
+      final s = (v ?? '').toString().trim();
+      if (s.isNotEmpty && s != '0') return s;
+    }
+    return '';
   }
 }

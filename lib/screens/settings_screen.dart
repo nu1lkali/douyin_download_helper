@@ -266,49 +266,55 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
 
           // ── 下载设置 ──
           _sectionLabel('下载设置'),
-          _card(child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('相册名称', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15)),
-                const SizedBox(height: 4),
-                const Text('视频和图片将保存到该相册下',
-                  style: TextStyle(color: Colors.grey, fontSize: 12)),
-                const SizedBox(height: 12),
-                Row(
+          _card(child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _albumController,
-                        decoration: InputDecoration(
-                          hintText: '便捷下载',
-                          prefixIcon: const Icon(Icons.photo_album_rounded, size: 20),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(color: _primary, width: 2),
+                    const Text('相册名称', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15)),
+                    const SizedBox(height: 4),
+                    const Text('视频和图片将保存到该相册下',
+                      style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _albumController,
+                            decoration: InputDecoration(
+                              hintText: '便捷下载',
+                              prefixIcon: const Icon(Icons.photo_album_rounded, size: 20),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: const BorderSide(color: _primary, width: 2),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                              isDense: true,
+                            ),
                           ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                          isDense: true,
                         ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    ElevatedButton(
-                      onPressed: _saveAlbumName,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _primary,
-                        minimumSize: const Size(64, 46),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        elevation: 0,
-                      ),
-                      child: const Text('保存'),
+                        const SizedBox(width: 10),
+                        ElevatedButton(
+                          onPressed: _saveAlbumName,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _primary,
+                            minimumSize: const Size(64, 46),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            elevation: 0,
+                          ),
+                          child: const Text('保存'),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+              const Divider(height: 1, indent: 16, endIndent: 16),
+              _GroupByAuthorSwitch(primary: _primary),
+            ],
           )),
 
           const SizedBox(height: 20),
@@ -473,4 +479,41 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
     ),
     child: child,
   );
+}
+
+// 独立的按作者分组开关（有自己的状态）
+class _GroupByAuthorSwitch extends StatefulWidget {
+  final Color primary;
+  const _GroupByAuthorSwitch({required this.primary});
+
+  @override
+  State<_GroupByAuthorSwitch> createState() => _GroupByAuthorSwitchState();
+}
+
+class _GroupByAuthorSwitchState extends State<_GroupByAuthorSwitch> {
+  bool _value = false;
+
+  @override
+  void initState() {
+    super.initState();
+    SettingsService.getGroupByAuthor().then((v) => setState(() => _value = v));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SwitchListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+      title: const Text('按发布者分组', style: TextStyle(fontWeight: FontWeight.w500)),
+      subtitle: Text(
+        '开启后保存到 相册名/发布者名 子文件夹，文件名也会带上发布者',
+        style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+      ),
+      value: _value,
+      activeColor: widget.primary,
+      onChanged: (v) async {
+        await SettingsService.setGroupByAuthor(v);
+        setState(() => _value = v);
+      },
+    );
+  }
 }

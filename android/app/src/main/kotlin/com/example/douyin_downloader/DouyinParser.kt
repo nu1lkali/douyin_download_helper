@@ -15,6 +15,7 @@ object DouyinParser {
         val author: String,
         val videoUrl: String,
         val images: List<String>,
+        val shortId: String = "",
         val albumName: String = "便捷下载",
     ) {
         val isVideo get() = images.isEmpty()
@@ -107,6 +108,7 @@ object DouyinParser {
 
         val title = item.optString("desc", "")
         val authorName = author?.optString("nickname", "") ?: ""
+        val shortId = author?.optString("short_id", "") ?: ""
 
         // 无水印视频URL
         var videoUrl = ""
@@ -142,8 +144,30 @@ object DouyinParser {
         return ParseResult(
             title = title,
             author = authorName,
+            shortId = shortId,
             videoUrl = videoUrl,
             images = images,
         )
+    }
+
+    /** 构建文件名：prefix_yyyyMMdd_HHmmss_标题_作者_shortId.ext */
+    fun buildFileName(prefix: String, ext: String, title: String, author: String, shortId: String): String {
+        val now = java.util.Calendar.getInstance()
+        val ts = "%04d%02d%02d_%02d%02d%02d".format(
+            now.get(java.util.Calendar.YEAR),
+            now.get(java.util.Calendar.MONTH) + 1,
+            now.get(java.util.Calendar.DAY_OF_MONTH),
+            now.get(java.util.Calendar.HOUR_OF_DAY),
+            now.get(java.util.Calendar.MINUTE),
+            now.get(java.util.Calendar.SECOND)
+        )
+        val illegal = Regex("""[\\/:*?"<>|\n\r]""")
+        val cleanTitle = title.replace(Regex("#\\S+"), "").trim()
+            .replace(illegal, "_").take(20).trim()
+        val parts = mutableListOf(prefix, ts)
+        if (cleanTitle.isNotEmpty()) parts.add(cleanTitle)
+        if (author.isNotEmpty()) parts.add(author.replace(illegal, "_"))
+        if (shortId.isNotEmpty()) parts.add(shortId)
+        return "${parts.joinToString("_")}.$ext"
     }
 }
