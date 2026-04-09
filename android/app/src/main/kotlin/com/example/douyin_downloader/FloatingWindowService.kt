@@ -1,24 +1,28 @@
 package com.example.douyin_downloader
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.ClipboardManager
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.*
+import android.os.Build
+import android.os.Environment
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.provider.MediaStore
 import android.view.*
 import android.widget.*
 import java.io.File
 import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
-import android.content.ContentValues
-import android.content.SharedPreferences
-import android.os.Build
-import android.os.Environment
-import android.provider.MediaStore
 
 class FloatingWindowService : Service() {
 
@@ -142,7 +146,7 @@ class FloatingWindowService : Service() {
 
             Thread {
                 try {
-                    val result = DouyinParser.parse(clipText)
+                    val result = parseWithSettings(clipText)
                     mainHandler.post {
                         progress.visibility = View.GONE
                         tvStatus.text = "解析成功"
@@ -153,33 +157,56 @@ class FloatingWindowService : Service() {
 
                         if (result.isVideo) {
                             btnVideo.visibility = View.VISIBLE
+                            btnVideo.text = if (result.isLive) "下载全部片段(${result.images.size}个)" else "下载视频"
                             btnVideo.setOnClickListener {
-                                btnVideo.isEnabled = false
-                                btnVideo.text = "下载中..."
-                                val fileName = DouyinParser.buildFileName("video", "mp4", result.title, result.author, result.shortId)
-                                val album = buildAlbumPath(result.author, result.shortId)
                                 btnVideo.isEnabled = false
                                 btnVideo.text = "下载中..."
                                 progressDownload.visibility = View.VISIBLE
                                 progressDownload.progress = 0
                                 tvDownloadProgress.visibility = View.VISIBLE
-                                tvDownloadProgress.text = "0%"
-                                downloadInBackground(result.videoUrl, false, album, fileName,
-                                    onProgress = { downloaded, total ->
-                                        if (total > 0) {
-                                            val pct = (downloaded * 100 / total).toInt()
-                                            mainHandler.post {
-                                                progressDownload.progress = pct
-                                                tvDownloadProgress.text = "$pct%"
+
+                                if (result.isLive && result.images.isNotEmpty()) {
+                                    // 实况：下载所有片段（视频+图片混合）
+                                    var done = 0
+                                    result.images.forEachIndexed { i, url ->
+                                        val ext = if (url.contains("video_id=") || url.contains("/play/")) "mp4" else "jpg"
+                                        val prefix = if (ext == "mp4") "clip_$i" else "img_$i"
+                                        val fileName = DouyinParser.buildFileName(prefix, ext, result.title, result.author, result.shortId)
+                                        val album = buildAlbumPath(result.author, result.shortId)
+                                        downloadInBackground(url, ext == "jpg", album, fileName, onProgress = null) { _, _ ->
+                                            done++
+                                            if (done == result.images.size) {
+                                                mainHandler.post {
+                                                    progressDownload.visibility = View.GONE
+                                                    tvDownloadProgress.visibility = View.GONE
+                                                    btnVideo.text = "✓ ${result.images.size}个片段已保存"
+                                                    scheduleAutoClose()
+                                                }
                                             }
                                         }
                                     }
-                                ) { ok, msg ->
-                                    mainHandler.post {
-                                        progressDownload.visibility = View.GONE
-                                        tvDownloadProgress.visibility = View.GONE
-                                        btnVideo.text = if (ok) "✓ 已保存到相册" else "下载失败: $msg"
-                                        if (ok) scheduleAutoClose()
+                                } else {
+                                    // 普通视频
+                                    tvDownloadProgress.text = "0%"
+                                    val fileName = DouyinParser.buildFileName("video", "mp4", result.title, result.author, result.shortId)
+                                    val album = buildAlbumPath(result.author, result.shortId)
+                                    downloadInBackground(result.videoUrl, false, album, fileName,
+                                        onProgress = { downloaded, total ->
+                                            if (total > 0) {
+                                                val pct = (downloaded * 100 / total).toInt()
+                                                mainHandler.post {
+                                                    progressDownload.progress = pct
+                                                    tvDownloadProgress.text = "$pct%"
+                                                }
+                                            }
+                                        }
+                                    ) { ok, msg ->
+                                        mainHandler.post {
+                                            progressDownload.visibility = View.GONE
+                                            tvDownloadProgress.visibility = View.GONE
+                                            btnVideo.text = if (ok) "✓ 已保存到相册" else "下载失败: $msg"
+                                            if (ok) scheduleAutoClose()
+                                        }
                                     }
                                 }
                             }
@@ -231,6 +258,73 @@ class FloatingWindowService : Service() {
                 }
             }.start()
         }, 200) // 等200ms让窗口获得焦点
+    }
+
+    private fun startForegroundService() {
+        val channelId = "floating_window_channel"
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(channelId, "悬浮窗服务", NotificationManager.IMPORTANCE_LOW).apply {
+                description = "保持悬浮窗运行"
+                setShowBadge(false)
+            }
+            getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0,
+            Intent(this, MainActivity::class.java),
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE
+            else 0
+        )
+        val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Notification.Builder(this, channelId)
+        } else {
+            @Suppress("DEPRECATION")
+            Notification.Builder(this)
+        }
+        val notification = builder
+            .setContentTitle("便捷下载")
+            .setContentText("悬浮窗运行中，点击返回应用")
+            .setSmallIcon(android.R.drawable.ic_menu_share)
+            .setContentIntent(pendingIntent)
+            .build()
+
+        // Android 9+ 才调用 startForeground
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            startForeground(1, notification)
+        }
+    }
+
+    /** 根据设置选择解析方式 */
+    private fun parseWithSettings(text: String): DouyinParser.ParseResult {
+        val prefs = getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
+        val parseMode = prefs.getString("flutter.parse_mode", "remote") ?: "remote"
+        val remoteApi = prefs.getString("flutter.remote_api", "hk0") ?: "hk0"
+        val cookie = prefs.getString("flutter.douyin_cookie", "") ?: ""
+
+        return when {
+            parseMode == "local" -> {
+                // 本地解析（iesdouyin HTML）
+                DouyinParser.parse(text)
+            }
+            remoteApi == "self" -> {
+                // 自建接口
+                val baseUrl = (prefs.getString("flutter.self_hosted_url", "") ?: "").trimEnd('/')
+                val token = prefs.getString("flutter.self_hosted_token", "") ?: ""
+                if (baseUrl.isNotEmpty() && token.isNotEmpty()) {
+                    SelfHostedParser.parse(text, baseUrl, token, cookie)
+                } else {
+                    throw Exception("自建接口未配置地址或Token，请在设置中填写")
+                }
+            }
+            remoteApi == "xinyew" -> {
+                // xinyew 接口
+                RemoteParser.parseXinyew(text)
+            }
+            else -> {
+                // hk0 接口（默认）
+                RemoteParser.parseHk0(text)
+            }
+        }
     }
 
     /** 读取设置，构建完整相册路径（含分组子目录） */

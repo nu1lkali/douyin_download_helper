@@ -1,0 +1,72 @@
+如果返回结果里同时存在实况、视频或图片
+实况的情况，解析后装配会不对，实况 当做图片下载
+app没做保活 会被杀 或者悬浮窗消失
+1.05 # 张雅倩  https://v.douyin.com/RuHNBrrL_8w/ 复制此链接，打开抖音搜索，直接观看视频！ x@s.re RKJ:/ 09/21 
+{
+  "message": "获取数据成功！",
+  "data": {
+    "collection_time": "2026-04-09 14:00:59",
+    "id": "7626395456368788665",
+    "desc": "#张雅倩",
+    "create_timestamp": 1775658563,
+    "create_time": "2026-04-08 22:29:23",
+    "text_extra": [
+      "张雅倩"
+    ],
+    "type": "实况",
+    "duration": "00:00:00",
+    "uri": "",
+    "height": -1,
+    "width": -1,
+    "dynamic_cover": "",
+    "static_cover": "",
+    "downloads": [
+      "https://www.douyin.com/aweme/v1/play/?video_id=v2700fgi0000d7b6c9nog65gfni1m760&line=0&file_id=9812a30afad4426992cce9b371d91ad4&sign=922509384c4ddd4c426d01f4b0cd2549&is_play_url=1&source=PackSourceEnum_AWEME_DETAIL",
+      "https://www.douyin.com/aweme/v1/play/?video_id=v2700fgi0000d7b6ca7og65udii00log&line=0&file_id=85876070691840b486f955992767f223&sign=7642620fd1fa18c5cd8d8fb2785f8fcb&is_play_url=1&source=PackSourceEnum_AWEME_DETAIL",
+      "https://www.douyin.com/aweme/v1/play/?video_id=v2700fgi0000d7b6canog65gfni1m7lg&line=0&file_id=66a3435a5b8b461da30036304a0ede43&sign=1e5c4d5f18ce647f71da7d15bee0a4b0&is_play_url=1&source=PackSourceEnum_AWEME_DETAIL",
+      "https://p3-pc-sign.douyinpic.com/tos-cn-i-0813c000-ce/oA7FxLJ7ADveG8rsGTmeACOsbAIBQAegGMzdIg~tplv-dy-aweme-images:q75.jpeg?lk3s=138a59ce&x-expires=1778306400&x-signature=h0n1NfnElI50wnmto8riLyGlUyU%3D&from=327834062&s=PackSourceEnum_AWEME_DETAIL&se=false&sc=image&biz_tag=aweme_images&l=202604091400516D4594C6C597298CC834",
+      "https://p3-pc-sign.douyinpic.com/tos-cn-i-0813c000-ce/o0gAeIMgTJA9zdv8AGFqGjfrLAxIOQe7GBDssE~tplv-dy-aweme-images:q75.jpeg?lk3s=138a59ce&x-expires=1778306400&x-signature=PlDc1ULu53DMUsrzpv9MgrEZgmc%3D&from=327834062&s=PackSourceEnum_AWEME_DETAIL&se=false&sc=image&biz_tag=aweme_images&l=202604091400516D4594C6C597298CC834",
+      "https://www.douyin.com/aweme/v1/play/?video_id=v2700fgi0000d7b6cb7og65ihv1f46m0&line=0&file_id=d0896e163630450f87e1ebdcbcce7885&sign=f74cd890e50c90c1fef39eda7fe2e0c2&is_play_url=1&source=PackSourceEnum_AWEME_DETAIL",
+      "https://www.douyin.com/aweme/v1/play/?video_id=v2700fgi0000d7b6cbnog65tena6o78g&line=0&file_id=169497d98884446f95c708bb19ce9238&sign=cd99e003de65405beed144707f08bd3a&is_play_url=1&source=PackSourceEnum_AWEME_DETAIL",
+      "https://www.douyin.com/aweme/v1/play/?video_id=v2700fgi0000d7b6cc7og65gfni1m860&line=0&file_id=3920f32c8d6a41d8b17745bba5b3d7b6&sign=13734c6656d097f7bc2fdcdff7eaee18&is_play_url=1&source=PackSourceEnum_AWEME_DETAIL",
+      "https://www.douyin.com/aweme/v1/play/?video_id=v2700fgi0000d7b6ccnog65ltqbkaijg&line=0&file_id=21a1452100be4117baf7bc47a6d33a1f&sign=e2fddfd4255934117f0656406baa2f7a&is_play_url=1&source=PackSourceEnum_AWEME_DETAIL",
+      "https://www.douyin.com/aweme/v1/play/?video_id=v2700fgi0000d7b6ccnog65s9qvt1m8g&line=0&file_id=96621032c7bb41118a39c7847f1767f6&sign=cb11ef82541bef4a57850e8d2cdc1753&is_play_url=1&source=PackSourceEnum_AWEME_DETAIL",
+      "https://www.douyin.com/aweme/v1/play/?video_id=v2700fgi0000d7b6ccvog65jjcqsgj6g&line=0&file_id=ac9efe5c82f64748b02a69a9f0ec8cbc&sign=9d153dc58d88b78bbcbf28fcdc9fc3ae&is_play_url=1&source=PackSourceEnum_AWEME_DETAIL",
+      "https://www.douyin.com/aweme/v1/play/?video_id=v2700fgi0000d7b6cdfog65ifeh96t5g&line=0&file_id=fc5eb259767443efa60b027fb5be3b57&sign=971119f318120fc32ddf61ee800c9d40&is_play_url=1&source=PackSourceEnum_AWEME_DETAIL",
+      "https://www.douyin.com/aweme/v1/play/?video_id=v2700fgi0000d7b6cdnog65pj9tnlj5g&line=0&file_id=6b62a724606441a1805cf0528f6a22ff&sign=086c63770474573f99d61f0692567e40&is_play_url=1&source=PackSourceEnum_AWEME_DETAIL",
+      "https://www.douyin.com/aweme/v1/play/?video_id=v2700fgi0000d7b6cdnog65hsv3r9nh0&line=0&file_id=a453841fc6fe47eaa00603a3dea3c9d6&sign=452d86432284717470871d3aefd0c85c&is_play_url=1&source=PackSourceEnum_AWEME_DETAIL",
+      "https://p3-pc-sign.douyinpic.com/tos-cn-i-0813c000-ce/oQWiw6BAAI0AiDdM1nfCeRdbj3zsZzAAAiEkvE~tplv-dy-aweme-images:q75.jpeg?lk3s=138a59ce&x-expires=1778306400&x-signature=1jb3%2F2SUjVFEsjf%2BhTmWR2lUDqY%3D&from=327834062&s=PackSourceEnum_AWEME_DETAIL&se=false&sc=image&biz_tag=aweme_images&l=202604091400516D4594C6C597298CC834",
+      "https://www.douyin.com/aweme/v1/play/?video_id=v2700fgi0000d7b6ce7og65n9v8ehqpg&line=0&file_id=81bdcfa9a0cf4ae78c4cdb8fdd43e38b&sign=01e89ac2928b308e52c947a9cfe96ebd&is_play_url=1&source=PackSourceEnum_AWEME_DETAIL"
+    ],
+    "uid": "102539013028",
+    "sec_uid": "MS4wLjABAAAA31br1I4-NFR7kXAn1m4EuJvDW4Btmn01gdrBUwJVwTQ",
+    "unique_id": "dyyexxys2muy",
+    "signature": "可惜 加油",
+    "user_age": -1,
+    "nickname": "像素小兔",
+    "mark": "像素小兔",
+    "music_author": "DHC77",
+    "music_title": "兜圈 (路过了 学校花店 荒野到海边)",
+    "music_url": "https://sf6-cdn-tos.douyinstatic.com/obj/tos-cn-ve-2774/oIBRwi8QyMW3QiqWphVfKIJSRvBlAsQG70IaBA",
+    "digg_count": 892,
+    "comment_count": 2,
+    "collect_count": 57,
+    "share_count": 34,
+    "play_count": -1,
+    "tag": [
+      "明星八卦",
+      "明星随拍资讯",
+      ""
+    ],
+    "extra": "",
+    "share_url": "https://www.douyin.com/note/7626395456368788665"
+  },
+  "params": {
+    "cookie": "",
+    "proxy": "",
+    "source": false,
+    "detail_id": "7626395456368788665"
+  },
+  "time": "2026-04-09 14:00:59"
+}
+视频返回的是会带一个video_id的 要处理下这种混合情况

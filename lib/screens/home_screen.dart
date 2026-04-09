@@ -90,7 +90,18 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       }
     } catch (e) {
-      _showError(e.toString().replaceAll('Exception: ', ''));
+      final msg = e.toString().replaceAll('Exception: ', '');
+      _showError(msg);
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text('调试信息'),
+            content: SingleChildScrollView(child: SelectableText(msg)),
+            actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('关闭'))],
+          ),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

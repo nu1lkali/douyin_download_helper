@@ -29,7 +29,9 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
   }
 
   bool get isVideo => widget.videoInfo.isVideo;
+  bool get isLive => widget.videoInfo.isLive;
   List<String> get imageList => widget.videoInfo.imageList;
+  List<String> get liveClips => widget.videoInfo.liveClips;
 
   Future<void> _downloadVideo() async {
     setState(() { _isDownloading = true; _progress = 0; });
@@ -59,8 +61,13 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
       final album = await _downloadService.buildAlbumPath(_albumName, author, uid);
       for (int i = 0; i < imageList.length; i++) {
         try {
-          final fileName = _downloadService.buildFileName('img_$i', 'jpg', author, title, uid);
-          await _downloadService.downloadFile(imageList[i], fileName, album, null);
+          // 根据URL判断是图片还是视频（实况）
+          final url = imageList[i];
+          final isVideoUrl = url.contains('video_id=') || url.contains('/play/');
+          final ext = isVideoUrl ? 'mp4' : 'jpg';
+          final prefix = isVideoUrl ? 'clip_$i' : 'img_$i';
+          final fileName = _downloadService.buildFileName(prefix, ext, author, title, uid);
+          await _downloadService.downloadFile(url, fileName, album, null);
           success++;
         } catch (_) {
           failed++;
@@ -69,9 +76,9 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
       }
       if (mounted) {
         if (failed == 0) {
-          _showSnack('${imageList.length} 张图片已保存到相册');
+          _showSnack('${imageList.length} 个文件已保存到相册');
         } else {
-          _showSnack('下载完成：$success 张成功，$failed 张失败');
+          _showSnack('下载完成：$success 个成功，$failed 个失败');
         }
       }
     } finally {
@@ -85,11 +92,47 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
       final title = widget.videoInfo.title;
       final uid = widget.videoInfo.uid;
       final album = await _downloadService.buildAlbumPath(_albumName, author, uid);
-      final fileName = _downloadService.buildFileName('img_$index', 'jpg', author, title, uid);
+      final isVideoUrl = url.contains('video_id=') || url.contains('/play/');
+      final ext = isVideoUrl ? 'mp4' : 'jpg';
+      final prefix = isVideoUrl ? 'clip_$index' : 'img_$index';
+      final fileName = _downloadService.buildFileName(prefix, ext, author, title, uid);
       await _downloadService.downloadFile(url, fileName, album, null);
-      if (mounted) _showSnack('图片已保存到相册');
+      if (mounted) _showSnack(isVideoUrl ? '视频片段已保存到相册' : '图片已保存到相册');
     } catch (e) {
       if (mounted) _showSnack(e.toString());
+    }
+  }
+
+  Future<void> _downloadLiveClips() async {
+    setState(() { _isDownloading = true; _progress = 0; });
+    int success = 0, failed = 0;
+    final clips = liveClips;
+    try {
+      final author = widget.videoInfo.author;
+      final title = widget.videoInfo.title;
+      final uid = widget.videoInfo.uid;
+      final album = await _downloadService.buildAlbumPath(_albumName, author, uid);
+      for (int i = 0; i < clips.length; i++) {
+        try {
+          final url = clips[i];
+          final isVideoClip = url.contains('video_id=') || url.contains('/play/');
+          final ext = isVideoClip ? 'mp4' : 'jpg';
+          final prefix = isVideoClip ? 'clip_$i' : 'img_$i';
+          final fileName = _downloadService.buildFileName(prefix, ext, author, title, uid);
+          await _downloadService.downloadFile(url, fileName, album, null);
+          success++;
+        } catch (_) {
+          failed++;
+        }
+        setState(() => _progress = (i + 1) / clips.length);
+      }
+      if (mounted) {
+        _showSnack(failed == 0
+            ? '${clips.length} 个片段已保存到相册'
+            : '下载完成：$success 个成功，$failed 个失败');
+      }
+    } finally {
+      if (mounted) setState(() => _isDownloading = false);
     }
   }
 
@@ -140,7 +183,7 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: Text(isVideo ? '视频详情' : '图集详情',
+        title: Text(isLive ? '实况详情' : (isVideo ? '视频详情' : '图集详情'),
           style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
@@ -188,7 +231,9 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                       children: [
                         _statChip(Icons.favorite_rounded, '${widget.videoInfo.like}', Colors.redAccent),
                         const SizedBox(width: 8),
-                        if (isVideo)
+                        if (isLive)
+                          _statChip(Icons.video_collection_rounded, '${liveClips.length} 个片段', Colors.orange)
+                        else if (isVideo)
                           _statChip(Icons.access_time_rounded, _formatDuration(widget.videoInfo.duration), Colors.grey)
                         else
                           _statChip(Icons.photo_library_rounded, '${imageList.length} 张', _primary),
@@ -243,31 +288,49 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                       const SizedBox(height: 12),
                     ],
                     if (isVideo) ...[
-                      // 视频：两个并排按钮
-                      Row(
-                        children: [
-                          Expanded(child: _dlButton(
-                            icon: Icons.videocam_rounded,
-                            label: '下载视频',
-                            onTap: _isDownloading ? null : _downloadVideo,
-                          )),
-                          const SizedBox(width: 10),
-                          Expanded(child: _dlButton(
-                            icon: Icons.image_rounded,
-                            label: '下载封面',
-                            onTap: _isDownloading ? null : _downloadCover,
-                            outlined: true,
-                          )),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
+                      // 实况：只显示下载片段按钮
+                      if (isLive) ...[
+                        _dlButton(
+                          icon: Icons.video_collection_rounded,
+                          label: '下载全部片段（${liveClips.length}个）',
+                          onTap: _isDownloading ? null : _downloadLiveClips,
+                          full: true,
+                        ),
+                      ] else ...[
+                        // 普通视频：两个并排按钮
+                        Row(
+                          children: [
+                            Expanded(child: _dlButton(
+                              icon: Icons.videocam_rounded,
+                              label: '下载视频',
+                              onTap: _isDownloading ? null : _downloadVideo,
+                            )),
+                            const SizedBox(width: 10),
+                            Expanded(child: _dlButton(
+                              icon: Icons.image_rounded,
+                              label: '下载封面',
+                              onTap: _isDownloading ? null : _downloadCover,
+                              outlined: true,
+                            )),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        _dlButton(
+                          icon: Icons.download_for_offline_rounded,
+                          label: '一键下载（视频+封面）',
+                          onTap: _isDownloading ? null : () async {
+                            await _downloadVideo();
+                            await _downloadCover();
+                          },
+                          full: true,
+                        ),
+                      ],
+                    ] else if (isLive) ...[
+                      // 实况：下载所有片段
                       _dlButton(
-                        icon: Icons.download_for_offline_rounded,
-                        label: '一键下载（视频+封面）',
-                        onTap: _isDownloading ? null : () async {
-                          await _downloadVideo();
-                          await _downloadCover();
-                        },
+                        icon: Icons.video_collection_rounded,
+                        label: '下载全部片段（${liveClips.length}个）',
+                        onTap: _isDownloading ? null : _downloadLiveClips,
                         full: true,
                       ),
                     ] else ...[
@@ -292,10 +355,53 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
   }
 
   Widget _buildVideoCover() {
+    // 实况没有封面，显示占位
+    if (isLive) {
+      return Container(
+        width: double.infinity,
+        height: 200,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Colors.grey[850]!, Colors.grey[900]!],
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.video_collection_rounded, color: Colors.white70, size: 40),
+            ),
+            const SizedBox(height: 12),
+            Text('实况 · ${liveClips.length} 个片段',
+              style: const TextStyle(color: Colors.white70, fontSize: 15, fontWeight: FontWeight.w500)),
+            const SizedBox(height: 4),
+            const Text('Live 实况暂无封面预览',
+              style: TextStyle(color: Colors.white38, fontSize: 12)),
+          ],
+        ),
+      );
+    }
+
+    final cover = widget.videoInfo.cover;
+    if (cover.isEmpty) {
+      return Container(
+        height: 200,
+        color: Colors.grey[200],
+        child: const Icon(Icons.broken_image_rounded, size: 48, color: Colors.grey),
+      );
+    }
+
     return AspectRatio(
       aspectRatio: 16 / 9,
       child: Image.network(
-        widget.videoInfo.cover,
+        cover,
         fit: BoxFit.cover,
         errorBuilder: (_, __, ___) => Container(
           color: Colors.grey[200],

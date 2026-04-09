@@ -3,6 +3,7 @@ import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import '../services/floating_window_service.dart';
 import '../services/settings_service.dart';
+import '../services/log_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -383,6 +384,10 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
 
           const SizedBox(height: 24),
 
+          // ── 调试日志 ──
+          _sectionLabel('调试'),
+          _card(child: _LogViewer(primary: _primary)),
+
           // ── 关于 ──
           Center(
             child: Column(
@@ -490,6 +495,181 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
   );
 }
 
+// 日志查看器
+class _LogViewer extends StatelessWidget {
+  final Color primary;
+  const _LogViewer({required this.primary});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        ListTile(
+          leading: Icon(Icons.article_rounded, color: primary, size: 20),
+          title: const Text('查看调试日志', style: TextStyle(fontWeight: FontWeight.w500)),
+          subtitle: const Text('查看完整请求日志', style: TextStyle(fontSize: 12)),
+          trailing: const Icon(Icons.chevron_right, size: 20),
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const _LogScreen())),
+        ),
+      ],
+    );
+  }
+}
+
+class _LogScreen extends StatefulWidget {
+  const _LogScreen();
+
+  @override
+  State<_LogScreen> createState() => _LogScreenState();
+}
+
+class _LogScreenState extends State<_LogScreen> {
+  String _logs = '加载中...';
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final logs = await LogService.readLogs();
+    setState(() => _logs = logs.isEmpty ? '暂无日志' : logs);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('调试日志'),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_outline_rounded),
+            tooltip: '清空日志',
+            onPressed: () async {
+              await LogService.clearLogs();
+              _load();
+            },
+          ),
+        ],
+      ),
+      backgroundColor: Colors.black,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(12),
+        child: SelectableText(
+          _logs,
+          style: const TextStyle(
+            color: Colors.greenAccent,
+            fontSize: 11,
+            fontFamily: 'monospace',
+            height: 1.5,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// 自建接口配置
+class _SelfHostedConfig extends StatefulWidget {
+  final Color primary;
+  const _SelfHostedConfig({required this.primary});
+
+  @override
+  State<_SelfHostedConfig> createState() => _SelfHostedConfigState();
+}
+
+class _SelfHostedConfigState extends State<_SelfHostedConfig> {
+  final _urlCtrl = TextEditingController();
+  final _tokenCtrl = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    SettingsService.getSelfHostedUrl().then((v) => _urlCtrl.text = v);
+    SettingsService.getSelfHostedToken().then((v) => _tokenCtrl.text = v);
+  }
+
+  @override
+  void dispose() {
+    _urlCtrl.dispose();
+    _tokenCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    await SettingsService.setSelfHostedUrl(_urlCtrl.text);
+    await SettingsService.setSelfHostedToken(_tokenCtrl.text);
+    if (mounted) {
+      FocusScope.of(context).unfocus();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('自建接口配置已保存'), behavior: SnackBarBehavior.floating),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            controller: _urlCtrl,
+            decoration: InputDecoration(
+              labelText: '接口地址',
+              hintText: 'http://your-server:port',
+              prefixIcon: const Icon(Icons.link_rounded, size: 20),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: widget.primary, width: 2),
+              ),
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: _tokenCtrl,
+            obscureText: true,
+            decoration: InputDecoration(
+              labelText: 'Token',
+              hintText: '接口鉴权 Token',
+              prefixIcon: const Icon(Icons.key_rounded, size: 20),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: widget.primary, width: 2),
+              ),
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            ),
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _save,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: widget.primary,
+                minimumSize: const Size(0, 42),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                elevation: 0,
+              ),
+              child: const Text('保存配置'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // 远程接口选择器
 class _RemoteApiSelector extends StatefulWidget {
   final Color primary;
@@ -523,6 +703,16 @@ class _RemoteApiSelectorState extends State<_RemoteApiSelector> {
           subtitle: '备用接口，字段较少（无封面、点赞数）',
           value: RemoteApi.xinyew,
         ),
+        const Divider(height: 1, indent: 16, endIndent: 16),
+        _apiOption(
+          title: '自建接口',
+          subtitle: '带 Cookie 请求，数据最完整，支持图集/实况',
+          value: RemoteApi.selfHosted,
+        ),
+        if (_api == RemoteApi.selfHosted) ...[
+          const Divider(height: 1),
+          _SelfHostedConfig(primary: widget.primary),
+        ],
       ],
     );
   }

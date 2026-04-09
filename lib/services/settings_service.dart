@@ -1,7 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum ParseMode { remote, local }
-enum RemoteApi { hk0, xinyew }
+enum RemoteApi { hk0, xinyew, selfHosted }
 
 class SettingsService {
   static const _keyFloatingWindow = 'floating_window_enabled';
@@ -12,6 +12,8 @@ class SettingsService {
   static const _keyGroupByAuthor = 'group_by_author';
   static const _keyCompactAutoClose = 'compact_auto_close';
   static const _keyRemoteApi = 'remote_api';
+  static const _keySelfHostedUrl = 'self_hosted_url';
+  static const _keySelfHostedToken = 'self_hosted_token';
 
   static Future<bool> getFloatingWindowEnabled() async {
     final prefs = await SharedPreferences.getInstance();
@@ -86,13 +88,40 @@ class SettingsService {
 
   static Future<RemoteApi> getRemoteApi() async {
     final prefs = await SharedPreferences.getInstance();
-    return (prefs.getString(_keyRemoteApi) ?? 'hk0') == 'xinyew'
-        ? RemoteApi.xinyew
-        : RemoteApi.hk0;
+    switch (prefs.getString(_keyRemoteApi) ?? 'hk0') {
+      case 'xinyew': return RemoteApi.xinyew;
+      case 'self': return RemoteApi.selfHosted;
+      default: return RemoteApi.hk0;
+    }
   }
 
   static Future<void> setRemoteApi(RemoteApi api) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_keyRemoteApi, api == RemoteApi.xinyew ? 'xinyew' : 'hk0');
+    final val = switch (api) {
+      RemoteApi.xinyew => 'xinyew',
+      RemoteApi.selfHosted => 'self',
+      _ => 'hk0',
+    };
+    await prefs.setString(_keyRemoteApi, val);
+  }
+
+  static Future<String> getSelfHostedUrl() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keySelfHostedUrl) ?? '';
+  }
+
+  static Future<void> setSelfHostedUrl(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keySelfHostedUrl, value.trim());
+  }
+
+  static Future<String> getSelfHostedToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keySelfHostedToken) ?? '';
+  }
+
+  static Future<void> setSelfHostedToken(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keySelfHostedToken, value.trim());
   }
 }

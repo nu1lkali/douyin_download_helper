@@ -36,8 +36,14 @@ class VideoInfo with _$VideoInfo {
   factory VideoInfo.fromJson(Map<String, dynamic> json) =>
       _$VideoInfoFromJson(json);
 
-  // images 是 List 就是图集，是 String 就是视频
+  // images 是 List 就是图集，是 String 就是视频（含实况）
   bool get isVideo => images is! List;
+  // 实况：images 字符串以 "实况:" 开头，包含多个视频片段URL
+  bool get isLive => images is String && (images as String).startsWith('实况:');
+  // 实况的所有片段URL
+  List<String> get liveClips => isLive
+      ? (images as String).substring(3).split('\n').where((s) => s.isNotEmpty).toList()
+      : [];
   List<String> get imageList =>
       images is List ? List<String>.from(images as List) : [];
 }

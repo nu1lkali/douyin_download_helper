@@ -16,9 +16,11 @@ object DouyinParser {
         val videoUrl: String,
         val images: List<String>,
         val shortId: String = "",
+        val isLive: Boolean = false,
         val albumName: String = "便捷下载",
     ) {
-        val isVideo get() = images.isEmpty()
+        // 视频或实况都走视频下载逻辑
+        val isVideo get() = images.isEmpty() || isLive
     }
 
     fun parse(text: String): ParseResult {

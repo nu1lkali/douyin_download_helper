@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import '../models/video_info.dart';
 import 'settings_service.dart';
 import 'local_parser_service.dart';
+import 'self_hosted_api_service.dart';
+import 'log_service.dart';
 
 class ApiService {
   static const _hk0Url = 'https://api.hk0.cc/api/douyin';
@@ -10,12 +12,20 @@ class ApiService {
 
   static Future<VideoInfo> parseVideo(String url) async {
     final mode = await SettingsService.getParseMode();
-    if (mode == ParseMode.local) return _parseLocal(url);
-
     final api = await SettingsService.getRemoteApi();
-    return api == RemoteApi.xinyew
-        ? _parseXinyew(url)
-        : _parseHk0(url);
+    await LogService.log('ApiService', 'parseVideo mode=$mode api=$api url=$url');
+
+    try {
+      if (mode == ParseMode.local) return await _parseLocal(url);
+      return switch (api) {
+        RemoteApi.xinyew => await _parseXinyew(url),
+        RemoteApi.selfHosted => await SelfHostedApiService.parse(url),
+        _ => await _parseHk0(url),
+      };
+    } catch (e, s) {
+      await LogService.logError('ApiService', e, s);
+      rethrow;
+    }
   }
 
   /// hk0 接口：返回完整字段
