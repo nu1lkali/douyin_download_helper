@@ -8,37 +8,9 @@ import java.nio.charset.Charset
 object SelfHostedParser {
 
     fun parse(text: String, base: String, token: String, cookie: String): DouyinParser.ParseResult {
-        // Step1: share
-        val realUrl = getShareUrl(text, base, token)
-        val awemeId = extractAwemeId(realUrl)
-            ?: throw Exception("无法从链接提取ID: $realUrl")
-
-        // Step2: detail
-        return getDetail(awemeId, base, token, cookie)
-    }
-
-    private fun getShareUrl(text: String, base: String, token: String): String {
-        val body = """{"text":"$text","proxy":""}"""
-        val resp = postJson("$base/douyin/share", token, body)
-        val json = JSONObject(resp)
-        return json.optString("url").takeIf { it.isNotEmpty() }
-            ?: throw Exception(json.optString("message", "获取链接失败"))
-    }
-
-    private fun extractAwemeId(url: String): String? {
-        listOf(
-            Regex("""/video/(\d+)"""),
-            Regex("""/note/(\d+)"""),
-            Regex("""modal_id=(\d+)"""),
-        ).forEach { r ->
-            r.find(url)?.groupValues?.get(1)?.let { return it }
-        }
-        return null
-    }
-
-    private fun getDetail(awemeId: String, base: String, token: String, cookie: String): DouyinParser.ParseResult {
-        val body = """{"cookie":"${cookie.replace("\"", "\\\"")}","proxy":"","source":false,"detail_id":"$awemeId"}"""
-        val resp = postJson("$base/douyin/detail", token, body)
+        // 使用合并接口 /douyin/share_detail，一次请求完成
+        val body = """{"text":${json(text)},"cookie":${json(cookie)},"proxy":"","source":false}"""
+        val resp = postJson("$base/douyin/share_detail", token, body)
         val root = JSONObject(resp)
 
         if (!root.optString("message", "").contains("成功")) {
@@ -46,6 +18,12 @@ object SelfHostedParser {
         }
 
         val d = root.getJSONObject("data")
+        return parseData(d)
+    }
+
+    private fun json(s: String) = "\"${s.replace("\\", "\\\\").replace("\"", "\\\"")}\""
+
+    private fun parseData(d: JSONObject): DouyinParser.ParseResult {
         val type = d.optString("type", "")
         val isVideo = type == "视频"
         val isLive = type == "实况"
@@ -57,8 +35,7 @@ object SelfHostedParser {
         when {
             isVideo -> videoUrl = downloads as? String ?: ""
             isLive -> {
-                // 实况：混合数组，视频URL含 video_id= 或 /play/，图片URL含 douyinpic
-                val arr = downloads as? org.json.JSONArray ?: d.optJSONArray("downloads")
+                val arr = d.optJSONArray("downloads")
                 val videoClips = mutableListOf<String>()
                 val imageClips = mutableListOf<String>()
                 if (arr != null) {
@@ -71,23 +48,21 @@ object SelfHostedParser {
                         }
                     }
                 }
-                val allClips = videoClips + imageClips
                 videoUrl = videoClips.firstOrNull() ?: ""
-                images.addAll(allClips)
+                images.addAll(videoClips + imageClips)
             }
-            downloads is org.json.JSONArray -> {
-                val arr = downloads
-                for (i in 0 until arr.length()) images.add(arr.getString(i))
+            else -> {
+                val arr = d.optJSONArray("downloads")
+                if (arr != null) {
+                    for (i in 0 until arr.length()) images.add(arr.getString(i))
+                }
             }
         }
 
-        val shortId = d.optString("uid", "")
-        val nickname = d.optString("nickname", "")
-
         return DouyinParser.ParseResult(
             title = d.optString("desc", ""),
-            author = nickname,
-            shortId = shortId,
+            author = d.optString("nickname", ""),
+            shortId = d.optString("uid", ""),
             videoUrl = videoUrl,
             images = images,
             isLive = isLive,
