@@ -54,32 +54,39 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
   Future<void> _downloadAllImages() async {
     setState(() { _isDownloading = true; _progress = 0; });
     int success = 0, failed = 0;
+    final total = imageList.length;
     try {
       final author = widget.videoInfo.author;
       final title = widget.videoInfo.title;
       final uid = widget.videoInfo.uid;
       final album = await _downloadService.buildAlbumPath(_albumName, author, uid);
-      for (int i = 0; i < imageList.length; i++) {
+      for (int i = 0; i < total; i++) {
         try {
-          // 根据URL判断是图片还是视频（实况）
           final url = imageList[i];
           final isVideoUrl = url.contains('video_id=') || url.contains('/play/');
           final ext = isVideoUrl ? 'mp4' : 'jpg';
           final prefix = isVideoUrl ? 'clip_$i' : 'img_$i';
           final fileName = _downloadService.buildFileName(prefix, ext, author, title, uid);
-          await _downloadService.downloadFile(url, fileName, album, null);
+          await _downloadService.downloadFile(url, fileName, album,
+            (received, fileTotal) {
+              if (fileTotal > 0) {
+                // 总进度 = 已完成文件占比 + 当前文件内进度
+                final done = i / total;
+                final current = (received / fileTotal) / total;
+                setState(() => _progress = done + current);
+              }
+            });
           success++;
         } catch (_) {
           failed++;
         }
-        setState(() => _progress = (i + 1) / imageList.length);
+        // 每完成一个，进度跳到该文件对应的整数位置
+        setState(() => _progress = (i + 1) / total);
       }
       if (mounted) {
-        if (failed == 0) {
-          _showSnack('${imageList.length} 个文件已保存到相册');
-        } else {
-          _showSnack('下载完成：$success 个成功，$failed 个失败');
-        }
+        _showSnack(failed == 0
+            ? '$total 个文件已保存到相册'
+            : '下载完成：$success 个成功，$failed 个失败');
       }
     } finally {
       if (mounted) setState(() => _isDownloading = false);
@@ -107,28 +114,36 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
     setState(() { _isDownloading = true; _progress = 0; });
     int success = 0, failed = 0;
     final clips = liveClips;
+    final total = clips.length;
     try {
       final author = widget.videoInfo.author;
       final title = widget.videoInfo.title;
       final uid = widget.videoInfo.uid;
       final album = await _downloadService.buildAlbumPath(_albumName, author, uid);
-      for (int i = 0; i < clips.length; i++) {
+      for (int i = 0; i < total; i++) {
         try {
           final url = clips[i];
           final isVideoClip = url.contains('video_id=') || url.contains('/play/');
           final ext = isVideoClip ? 'mp4' : 'jpg';
           final prefix = isVideoClip ? 'clip_$i' : 'img_$i';
           final fileName = _downloadService.buildFileName(prefix, ext, author, title, uid);
-          await _downloadService.downloadFile(url, fileName, album, null);
+          await _downloadService.downloadFile(url, fileName, album,
+            (received, fileTotal) {
+              if (fileTotal > 0) {
+                final done = i / total;
+                final current = (received / fileTotal) / total;
+                setState(() => _progress = done + current);
+              }
+            });
           success++;
         } catch (_) {
           failed++;
         }
-        setState(() => _progress = (i + 1) / clips.length);
+        setState(() => _progress = (i + 1) / total);
       }
       if (mounted) {
         _showSnack(failed == 0
-            ? '${clips.length} 个片段已保存到相册'
+            ? '$total 个片段已保存到相册'
             : '下载完成：$success 个成功，$failed 个失败');
       }
     } finally {
@@ -221,7 +236,7 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                         ),
                         const SizedBox(width: 8),
                         Expanded(
-                          child: Text(widget.videoInfo.author,
+                          child: Text('@${widget.videoInfo.author}',
                             style: const TextStyle(fontWeight: FontWeight.w500)),
                         ),
                       ],

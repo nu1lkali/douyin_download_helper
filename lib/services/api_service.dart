@@ -10,23 +10,44 @@ class ApiService {
   static const _hk0Url = 'https://api.hk0.cc/api/douyin';
   static const _xinyewUrl = 'https://api.xinyew.cn/api/douyinjx';
 
+  // 内存缓存：key=链接, value={'data': VideoInfo, 'expire': DateTime}
+  static final Map<String, Map<String, dynamic>> _cache = {};
+  static const _cacheDuration = Duration(minutes: 30);
+
   static Future<VideoInfo> parseVideo(String url) async {
+    // 检查缓存
+    final cached = _cache[url];
+    if (cached != null && (cached['expire'] as DateTime).isAfter(DateTime.now())) {
+      await LogService.log('ApiService', 'cache hit: $url');
+      return cached['data'] as VideoInfo;
+    }
+
     final mode = await SettingsService.getParseMode();
     final api = await SettingsService.getRemoteApi();
     await LogService.log('ApiService', 'parseVideo mode=$mode api=$api url=$url');
 
     try {
-      if (mode == ParseMode.local) return await _parseLocal(url);
-      return switch (api) {
-        RemoteApi.xinyew => await _parseXinyew(url),
-        RemoteApi.selfHosted => await SelfHostedApiService.parse(url),
-        _ => await _parseHk0(url),
-      };
+      VideoInfo result;
+      if (mode == ParseMode.local) {
+        result = await _parseLocal(url);
+      } else {
+        result = switch (api) {
+          RemoteApi.xinyew => await _parseXinyew(url),
+          RemoteApi.selfHosted => await SelfHostedApiService.parse(url),
+          _ => await _parseHk0(url),
+        };
+      }
+      // 写入缓存
+      _cache[url] = {'data': result, 'expire': DateTime.now().add(_cacheDuration)};
+      return result;
     } catch (e, s) {
       await LogService.logError('ApiService', e, s);
       rethrow;
     }
   }
+
+  /// 清除缓存（可在设置页手动调用）
+  static void clearCache() => _cache.clear();
 
   /// hk0 接口：返回完整字段
   static Future<VideoInfo> _parseHk0(String url) async {

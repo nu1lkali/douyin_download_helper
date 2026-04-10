@@ -299,7 +299,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                           const SizedBox(width: 4),
                                           Expanded(
                                             child: Text(
-                                              video.author,
+                                              '@${video.author}',
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                               style: TextStyle(

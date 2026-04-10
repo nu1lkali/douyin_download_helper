@@ -151,7 +151,7 @@ class FloatingWindowService : Service() {
                         progress.visibility = View.GONE
                         tvStatus.text = "解析成功"
                         tvTitle.text = result.title
-                        tvAuthor.text = result.author
+                        tvAuthor.text = "@${result.author}"
                         tvTitle.visibility = View.VISIBLE
                         tvAuthor.visibility = View.VISIBLE
 
@@ -166,20 +166,36 @@ class FloatingWindowService : Service() {
                                 tvDownloadProgress.visibility = View.VISIBLE
 
                                 if (result.isLive && result.images.isNotEmpty()) {
-                                    // 实况：下载所有片段（视频+图片混合）
+                                    // 实况：下载所有片段（视频+图片混合），总进度
+                                    val totalCount = result.images.size
                                     var done = 0
                                     result.images.forEachIndexed { i, url ->
                                         val ext = if (url.contains("video_id=") || url.contains("/play/")) "mp4" else "jpg"
                                         val prefix = if (ext == "mp4") "clip_$i" else "img_$i"
                                         val fileName = DouyinParser.buildFileName(prefix, ext, result.title, result.author, result.shortId)
                                         val album = buildAlbumPath(result.author, result.shortId)
-                                        downloadInBackground(url, ext == "jpg", album, fileName, onProgress = null) { _, _ ->
+                                        downloadInBackground(url, ext == "jpg", album, fileName,
+                                            onProgress = { downloaded, total ->
+                                                if (total > 0) {
+                                                    // 总进度 = 已完成 + 当前文件内进度
+                                                    val totalPct = ((done * 100 + (downloaded * 100 / total).toInt()) / totalCount).toInt()
+                                                    mainHandler.post {
+                                                        progressDownload.progress = totalPct
+                                                        tvDownloadProgress.text = "${i + 1}/$totalCount  $totalPct%"
+                                                    }
+                                                }
+                                            }
+                                        ) { _, _ ->
                                             done++
-                                            if (done == result.images.size) {
+                                            mainHandler.post {
+                                                progressDownload.progress = done * 100 / totalCount
+                                                tvDownloadProgress.text = "$done/$totalCount"
+                                            }
+                                            if (done == totalCount) {
                                                 mainHandler.post {
                                                     progressDownload.visibility = View.GONE
                                                     tvDownloadProgress.visibility = View.GONE
-                                                    btnVideo.text = "✓ ${result.images.size}个片段已保存"
+                                                    btnVideo.text = "✓ ${totalCount}个片段已保存"
                                                     scheduleAutoClose()
                                                 }
                                             }
@@ -220,6 +236,7 @@ class FloatingWindowService : Service() {
                                 progressDownload.progress = 0
                                 tvDownloadProgress.visibility = View.VISIBLE
                                 tvDownloadProgress.text = "0/${result.images.size}"
+                                val totalCount = result.images.size
                                 var done = 0
                                 result.images.forEachIndexed { i, url ->
                                     val fileName = DouyinParser.buildFileName("img_$i", "jpg", result.title, result.author, result.shortId)
@@ -227,21 +244,23 @@ class FloatingWindowService : Service() {
                                     downloadInBackground(url, true, album, fileName,
                                         onProgress = { downloaded, total ->
                                             if (total > 0) {
-                                                val filePct = (downloaded * 100 / total).toInt()
-                                                val totalPct = ((i * 100 + filePct) / result.images.size)
+                                                val totalPct = ((done * 100 + (downloaded * 100 / total).toInt()) / totalCount).toInt()
                                                 mainHandler.post {
                                                     progressDownload.progress = totalPct
-                                                    tvDownloadProgress.text = "${i + 1}/${result.images.size}  $totalPct%"
+                                                    tvDownloadProgress.text = "${i + 1}/$totalCount  $totalPct%"
                                                 }
                                             }
                                         }
-                                    ) { ok, _ ->
+                                    ) { _, _ ->
                                         done++
-                                        if (done == result.images.size) {
+                                        mainHandler.post {
+                                            progressDownload.progress = done * 100 / totalCount
+                                        }
+                                        if (done == totalCount) {
                                             mainHandler.post {
                                                 progressDownload.visibility = View.GONE
                                                 tvDownloadProgress.visibility = View.GONE
-                                                btnImages.text = "✓ ${result.images.size}张已保存到相册"
+                                                btnImages.text = "✓ ${totalCount}张已保存到相册"
                                                 scheduleAutoClose()
                                             }
                                         }
@@ -301,13 +320,14 @@ class FloatingWindowService : Service() {
         val remoteApi = prefs.getString("flutter.remote_api", "hk0") ?: "hk0"
         val cookie = prefs.getString("flutter.douyin_cookie", "") ?: ""
 
-        return when {
-            parseMode == "local" -> {
-                // 本地解析（iesdouyin HTML）
-                DouyinParser.parse(text)
-            }
+        // 检查缓存（以输入文本为key，缓存30分钟）
+        val cacheKey = "$parseMode:$remoteApi:$text"
+        val cached = ParseCache.get(cacheKey)
+        if (cached != null) return cached
+
+        val result = when {
+            parseMode == "local" -> DouyinParser.parse(text)
             remoteApi == "self" -> {
-                // 自建接口
                 val baseUrl = (prefs.getString("flutter.self_hosted_url", "") ?: "").trimEnd('/')
                 val token = prefs.getString("flutter.self_hosted_token", "") ?: ""
                 if (baseUrl.isNotEmpty() && token.isNotEmpty()) {
@@ -316,15 +336,12 @@ class FloatingWindowService : Service() {
                     throw Exception("自建接口未配置地址或Token，请在设置中填写")
                 }
             }
-            remoteApi == "xinyew" -> {
-                // xinyew 接口
-                RemoteParser.parseXinyew(text)
-            }
-            else -> {
-                // hk0 接口（默认）
-                RemoteParser.parseHk0(text)
-            }
+            remoteApi == "xinyew" -> RemoteParser.parseXinyew(text)
+            else -> RemoteParser.parseHk0(text)
         }
+
+        ParseCache.put(cacheKey, result)
+        return result
     }
 
     /** 读取设置，构建完整相册路径（含分组子目录） */
