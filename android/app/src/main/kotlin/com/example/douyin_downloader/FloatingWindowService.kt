@@ -30,6 +30,7 @@ class FloatingWindowService : Service() {
     private lateinit var floatingView: View
     private var compactPanel: View? = null
     private var isCompactMode = false
+    @Volatile private var isPanelActive = false
     private val mainHandler = Handler(Looper.getMainLooper())
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -115,6 +116,7 @@ class FloatingWindowService : Service() {
         ).apply { gravity = Gravity.CENTER }
 
         compactPanel = panel
+        isPanelActive = true
         windowManager.addView(panel, p)
 
         val tvStatus = panel.findViewById<TextView>(R.id.tv_status)
@@ -147,7 +149,7 @@ class FloatingWindowService : Service() {
             Thread {
                 try {
                     val result = parseWithSettings(clipText)
-                    mainHandler.post {
+                    safePost {
                         progress.visibility = View.GONE
                         tvStatus.text = "解析成功"
                         tvTitle.text = result.title
@@ -178,7 +180,7 @@ class FloatingWindowService : Service() {
                                                 if (total > 0) {
                                                     val completedCount = done.get()
                                                     val totalPct = ((completedCount * 100 + (downloaded * 100 / total).toInt()) / totalCount).toInt()
-                                                    mainHandler.post {
+                                                    safePost {
                                                         progressDownload.progress = totalPct
                                                         tvDownloadProgress.text = "${completedCount + 1}/$totalCount  $totalPct%"
                                                     }
@@ -186,12 +188,12 @@ class FloatingWindowService : Service() {
                                             }
                                         ) { _, _ ->
                                             val completedCount = done.incrementAndGet()
-                                            mainHandler.post {
+                                            safePost {
                                                 progressDownload.progress = completedCount * 100 / totalCount
                                                 tvDownloadProgress.text = "$completedCount/$totalCount"
                                             }
                                             if (completedCount == totalCount) {
-                                                mainHandler.post {
+                                                safePost {
                                                     progressDownload.visibility = View.GONE
                                                     tvDownloadProgress.visibility = View.GONE
                                                     btnVideo.text = "✓ ${totalCount}个片段已保存"
@@ -209,14 +211,14 @@ class FloatingWindowService : Service() {
                                         onProgress = { downloaded, total ->
                                             if (total > 0) {
                                                 val pct = (downloaded * 100 / total).toInt()
-                                                mainHandler.post {
+                                                safePost {
                                                     progressDownload.progress = pct
                                                     tvDownloadProgress.text = "$pct%"
                                                 }
                                             }
                                         }
                                     ) { ok, msg ->
-                                        mainHandler.post {
+                                        safePost {
                                             progressDownload.visibility = View.GONE
                                             tvDownloadProgress.visibility = View.GONE
                                             btnVideo.text = if (ok) "✓ 已保存到相册" else "下载失败: $msg"
@@ -245,7 +247,7 @@ class FloatingWindowService : Service() {
                                             if (total > 0) {
                                                 val completedCount = done.get()
                                                 val totalPct = ((completedCount * 100 + (downloaded * 100 / total).toInt()) / totalCount).toInt()
-                                                mainHandler.post {
+                                                safePost {
                                                     progressDownload.progress = totalPct
                                                     tvDownloadProgress.text = "${completedCount + 1}/$totalCount  $totalPct%"
                                                 }
@@ -253,12 +255,12 @@ class FloatingWindowService : Service() {
                                         }
                                     ) { _, _ ->
                                         val completedCount = done.incrementAndGet()
-                                        mainHandler.post {
+                                        safePost {
                                             progressDownload.progress = completedCount * 100 / totalCount
                                             tvDownloadProgress.text = "$completedCount/$totalCount"
                                         }
                                         if (completedCount == totalCount) {
-                                            mainHandler.post {
+                                            safePost {
                                                 progressDownload.visibility = View.GONE
                                                 tvDownloadProgress.visibility = View.GONE
                                                 btnImages.text = "✓ ${totalCount}张已保存到相册"
@@ -271,7 +273,7 @@ class FloatingWindowService : Service() {
                         }
                     }
                 } catch (e: Exception) {
-                    mainHandler.post {
+                    safePost {
                         progress.visibility = View.GONE
                         tvStatus.text = "解析失败: ${e.message}"
                     }
@@ -445,19 +447,25 @@ class FloatingWindowService : Service() {
         }
     }
 
+    private fun safePost(action: () -> Unit) {
+        mainHandler.post {
+            try { action() } catch (_: Exception) {}
+        }
+    }
+
     private fun scheduleAutoClose() {
         val prefs = getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
-        val delay = prefs.getInt("flutter.compact_auto_close_delay", 3)
-        if (delay < 0) return // -1 = 不关闭
-        val delayMs = delay * 1000L
+        val delay = prefs.getLong("flutter.compact_auto_close_delay", 3L).toInt()
+        if (delay < 0) return
+        val delayMs = maxOf(delay * 1000L, 1000L) // 最少1秒，防止崩溃
         mainHandler.postDelayed({ dismissCompactPanel() }, delayMs)
     }
 
     private fun dismissCompactPanel() {
-        compactPanel?.let {
-            try { windowManager.removeView(it) } catch (_: Exception) {}
-            compactPanel = null
-        }
+        isPanelActive = false
+        val panel = compactPanel ?: return
+        compactPanel = null
+        try { windowManager.removeView(panel) } catch (_: Exception) {}
     }
 
     override fun onDestroy() {
