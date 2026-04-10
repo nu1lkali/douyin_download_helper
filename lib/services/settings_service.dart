@@ -11,6 +11,7 @@ class SettingsService {
   static const _keyFloatingCompact = 'floating_compact_mode';
   static const _keyGroupByAuthor = 'group_by_author';
   static const _keyCompactAutoClose = 'compact_auto_close';
+  static const _keyCompactAutoCloseDelay = 'compact_auto_close_delay'; // 0=立即, 3=3秒, 5=5秒, -1=不关闭
   static const _keyRemoteApi = 'remote_api';
   static const _keySelfHostedUrl = 'self_hosted_url';
   static const _keySelfHostedToken = 'self_hosted_token';
@@ -84,6 +85,19 @@ class SettingsService {
   static Future<void> setCompactAutoClose(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyCompactAutoClose, value);
+  }
+
+  /// 自动关闭延迟：0=立即, 3=3秒, 5=5秒, -1=不关闭
+  static Future<int> getCompactAutoCloseDelay() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_keyCompactAutoCloseDelay) ?? 3;
+  }
+
+  static Future<void> setCompactAutoCloseDelay(int seconds) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_keyCompactAutoCloseDelay, seconds);
+    // 同步更新 compact_auto_close 开关
+    await prefs.setBool(_keyCompactAutoClose, seconds >= 0);
   }
 
   static Future<RemoteApi> getRemoteApi() async {

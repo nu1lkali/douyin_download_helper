@@ -166,9 +166,8 @@ class FloatingWindowService : Service() {
                                 tvDownloadProgress.visibility = View.VISIBLE
 
                                 if (result.isLive && result.images.isNotEmpty()) {
-                                    // 实况：下载所有片段（视频+图片混合），总进度
                                     val totalCount = result.images.size
-                                    var done = 0
+                                    val done = java.util.concurrent.atomic.AtomicInteger(0)
                                     result.images.forEachIndexed { i, url ->
                                         val ext = if (url.contains("video_id=") || url.contains("/play/")) "mp4" else "jpg"
                                         val prefix = if (ext == "mp4") "clip_$i" else "img_$i"
@@ -177,21 +176,21 @@ class FloatingWindowService : Service() {
                                         downloadInBackground(url, ext == "jpg", album, fileName,
                                             onProgress = { downloaded, total ->
                                                 if (total > 0) {
-                                                    // 总进度 = 已完成 + 当前文件内进度
-                                                    val totalPct = ((done * 100 + (downloaded * 100 / total).toInt()) / totalCount).toInt()
+                                                    val completedCount = done.get()
+                                                    val totalPct = ((completedCount * 100 + (downloaded * 100 / total).toInt()) / totalCount).toInt()
                                                     mainHandler.post {
                                                         progressDownload.progress = totalPct
-                                                        tvDownloadProgress.text = "${i + 1}/$totalCount  $totalPct%"
+                                                        tvDownloadProgress.text = "${completedCount + 1}/$totalCount  $totalPct%"
                                                     }
                                                 }
                                             }
                                         ) { _, _ ->
-                                            done++
+                                            val completedCount = done.incrementAndGet()
                                             mainHandler.post {
-                                                progressDownload.progress = done * 100 / totalCount
-                                                tvDownloadProgress.text = "$done/$totalCount"
+                                                progressDownload.progress = completedCount * 100 / totalCount
+                                                tvDownloadProgress.text = "$completedCount/$totalCount"
                                             }
-                                            if (done == totalCount) {
+                                            if (completedCount == totalCount) {
                                                 mainHandler.post {
                                                     progressDownload.visibility = View.GONE
                                                     tvDownloadProgress.visibility = View.GONE
@@ -237,26 +236,28 @@ class FloatingWindowService : Service() {
                                 tvDownloadProgress.visibility = View.VISIBLE
                                 tvDownloadProgress.text = "0/${result.images.size}"
                                 val totalCount = result.images.size
-                                var done = 0
+                                val done = java.util.concurrent.atomic.AtomicInteger(0)
                                 result.images.forEachIndexed { i, url ->
                                     val fileName = DouyinParser.buildFileName("img_$i", "jpg", result.title, result.author, result.shortId)
                                     val album = buildAlbumPath(result.author, result.shortId)
                                     downloadInBackground(url, true, album, fileName,
                                         onProgress = { downloaded, total ->
                                             if (total > 0) {
-                                                val totalPct = ((done * 100 + (downloaded * 100 / total).toInt()) / totalCount).toInt()
+                                                val completedCount = done.get()
+                                                val totalPct = ((completedCount * 100 + (downloaded * 100 / total).toInt()) / totalCount).toInt()
                                                 mainHandler.post {
                                                     progressDownload.progress = totalPct
-                                                    tvDownloadProgress.text = "${i + 1}/$totalCount  $totalPct%"
+                                                    tvDownloadProgress.text = "${completedCount + 1}/$totalCount  $totalPct%"
                                                 }
                                             }
                                         }
                                     ) { _, _ ->
-                                        done++
+                                        val completedCount = done.incrementAndGet()
                                         mainHandler.post {
-                                            progressDownload.progress = done * 100 / totalCount
+                                            progressDownload.progress = completedCount * 100 / totalCount
+                                            tvDownloadProgress.text = "$completedCount/$totalCount"
                                         }
-                                        if (done == totalCount) {
+                                        if (completedCount == totalCount) {
                                             mainHandler.post {
                                                 progressDownload.visibility = View.GONE
                                                 tvDownloadProgress.visibility = View.GONE
@@ -445,10 +446,11 @@ class FloatingWindowService : Service() {
     }
 
     private fun scheduleAutoClose() {
-        val prefs: SharedPreferences = getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
-        val autoClose = prefs.getBoolean("flutter.compact_auto_close", true)
-        if (!autoClose) return
-        mainHandler.postDelayed({ dismissCompactPanel() }, 3000)
+        val prefs = getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
+        val delay = prefs.getInt("flutter.compact_auto_close_delay", 3)
+        if (delay < 0) return // -1 = 不关闭
+        val delayMs = delay * 1000L
+        mainHandler.postDelayed({ dismissCompactPanel() }, delayMs)
     }
 
     private fun dismissCompactPanel() {

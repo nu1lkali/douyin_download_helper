@@ -769,29 +769,42 @@ class _CompactAutoCloseSwitch extends StatefulWidget {
 }
 
 class _CompactAutoCloseSwitchState extends State<_CompactAutoCloseSwitch> {
-  bool _value = true;
+  int _delay = 3; // 默认3秒
+
+  static const _options = [
+    (-1, '不自动关闭'),
+    (0, '立即关闭'),
+    (3, '3 秒后关闭'),
+    (5, '5 秒后关闭'),
+  ];
 
   @override
   void initState() {
     super.initState();
-    SettingsService.getCompactAutoClose().then((v) => setState(() => _value = v));
+    SettingsService.getCompactAutoCloseDelay().then((v) => setState(() => _delay = v));
   }
 
   @override
   Widget build(BuildContext context) {
-    return SwitchListTile(
+    final label = _options.firstWhere((o) => o.$1 == _delay, orElse: () => (3, '3 秒后关闭')).$2;
+    return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-      title: const Text('下载后自动关闭面板', style: TextStyle(fontWeight: FontWeight.w500)),
-      subtitle: Text(
-        '简洁模式下载完成后 3 秒自动关闭悬浮面板',
-        style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+      title: const Text('下载后关闭面板', style: TextStyle(fontWeight: FontWeight.w500)),
+      subtitle: Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+      trailing: DropdownButton<int>(
+        value: _delay,
+        underline: const SizedBox(),
+        items: _options.map((o) => DropdownMenuItem(
+          value: o.$1,
+          child: Text(o.$2, style: const TextStyle(fontSize: 13)),
+        )).toList(),
+        onChanged: (v) async {
+          if (v != null) {
+            await SettingsService.setCompactAutoCloseDelay(v);
+            setState(() => _delay = v);
+          }
+        },
       ),
-      value: _value,
-      activeColor: widget.primary,
-      onChanged: (v) async {
-        await SettingsService.setCompactAutoClose(v);
-        setState(() => _value = v);
-      },
     );
   }
 }
