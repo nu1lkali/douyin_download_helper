@@ -32,6 +32,10 @@ class FloatingWindowService : Service() {
     private var isCompactMode = false
     @Volatile private var isPanelActive = false
     private val mainHandler = Handler(Looper.getMainLooper())
+    
+    // 进度更新节流：最多每300ms更新一次UI
+    private var lastProgressUpdateTime = 0L
+    private val progressUpdateInterval = 300L
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -166,6 +170,7 @@ class FloatingWindowService : Service() {
                                 progressDownload.visibility = View.VISIBLE
                                 progressDownload.progress = 0
                                 tvDownloadProgress.visibility = View.VISIBLE
+                                lastProgressUpdateTime = 0L // 重置节流计时器
 
                                 if (result.isLive && result.images.isNotEmpty()) {
                                     val totalCount = result.images.size
@@ -178,11 +183,17 @@ class FloatingWindowService : Service() {
                                         downloadInBackground(url, ext == "jpg", album, fileName,
                                             onProgress = { downloaded, total ->
                                                 if (total > 0) {
-                                                    val completedCount = done.get()
-                                                    val totalPct = ((completedCount * 100 + (downloaded * 100 / total).toInt()) / totalCount).toInt()
-                                                    safePost {
-                                                        progressDownload.progress = totalPct
-                                                        tvDownloadProgress.text = "${completedCount + 1}/$totalCount  $totalPct%"
+                                                    val now = System.currentTimeMillis()
+                                                    // 节流：只在间隔超过300ms时更新UI
+                                                    if (now - lastProgressUpdateTime >= progressUpdateInterval) {
+                                                        lastProgressUpdateTime = now
+                                                        val completedCount = done.get()
+                                                        val currentPct = (downloaded * 100 / total).toInt()
+                                                        val totalPct = ((completedCount * 100 + currentPct) / totalCount).toInt()
+                                                        safePost {
+                                                            progressDownload.progress = totalPct
+                                                            tvDownloadProgress.text = "${completedCount + 1}/$totalCount  $totalPct%"
+                                                        }
                                                     }
                                                 }
                                             }
@@ -210,10 +221,15 @@ class FloatingWindowService : Service() {
                                     downloadInBackground(result.videoUrl, false, album, fileName,
                                         onProgress = { downloaded, total ->
                                             if (total > 0) {
-                                                val pct = (downloaded * 100 / total).toInt()
-                                                safePost {
-                                                    progressDownload.progress = pct
-                                                    tvDownloadProgress.text = "$pct%"
+                                                val now = System.currentTimeMillis()
+                                                // 节流：只在间隔超过300ms时更新UI
+                                                if (now - lastProgressUpdateTime >= progressUpdateInterval) {
+                                                    lastProgressUpdateTime = now
+                                                    val pct = (downloaded * 100 / total).toInt()
+                                                    safePost {
+                                                        progressDownload.progress = pct
+                                                        tvDownloadProgress.text = "$pct%"
+                                                    }
                                                 }
                                             }
                                         }
@@ -237,6 +253,7 @@ class FloatingWindowService : Service() {
                                 progressDownload.progress = 0
                                 tvDownloadProgress.visibility = View.VISIBLE
                                 tvDownloadProgress.text = "0/${result.images.size}"
+                                lastProgressUpdateTime = 0L // 重置节流计时器
                                 val totalCount = result.images.size
                                 val done = java.util.concurrent.atomic.AtomicInteger(0)
                                 result.images.forEachIndexed { i, url ->
@@ -245,11 +262,17 @@ class FloatingWindowService : Service() {
                                     downloadInBackground(url, true, album, fileName,
                                         onProgress = { downloaded, total ->
                                             if (total > 0) {
-                                                val completedCount = done.get()
-                                                val totalPct = ((completedCount * 100 + (downloaded * 100 / total).toInt()) / totalCount).toInt()
-                                                safePost {
-                                                    progressDownload.progress = totalPct
-                                                    tvDownloadProgress.text = "${completedCount + 1}/$totalCount  $totalPct%"
+                                                val now = System.currentTimeMillis()
+                                                // 节流：只在间隔超过300ms时更新UI
+                                                if (now - lastProgressUpdateTime >= progressUpdateInterval) {
+                                                    lastProgressUpdateTime = now
+                                                    val completedCount = done.get()
+                                                    val currentPct = (downloaded * 100 / total).toInt()
+                                                    val totalPct = ((completedCount * 100 + currentPct) / totalCount).toInt()
+                                                    safePost {
+                                                        progressDownload.progress = totalPct
+                                                        tvDownloadProgress.text = "${completedCount + 1}/$totalCount  $totalPct%"
+                                                    }
                                                 }
                                             }
                                         }

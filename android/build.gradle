@@ -18,7 +18,8 @@ allprojects {
     }
 }
 
-rootProject.buildDir = '../build'
+// 将编译输出目录设置到 E 盘
+rootProject.buildDir = 'E:/flutter_build/douyin_downloader/build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
