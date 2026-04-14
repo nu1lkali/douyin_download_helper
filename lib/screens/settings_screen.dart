@@ -601,7 +601,13 @@ class _SelfHostedConfigState extends State<_SelfHostedConfig> {
   }
 
   Future<void> _save() async {
-    await SettingsService.setSelfHostedUrl(_urlCtrl.text);
+    var url = _urlCtrl.text.trim();
+    // 没有协议头则默认补 http://
+    if (url.isNotEmpty && !url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'http://$url';
+      _urlCtrl.text = url;
+    }
+    await SettingsService.setSelfHostedUrl(url);
     await SettingsService.setSelfHostedToken(_tokenCtrl.text);
     if (mounted) {
       FocusScope.of(context).unfocus();
@@ -622,7 +628,7 @@ class _SelfHostedConfigState extends State<_SelfHostedConfig> {
             controller: _urlCtrl,
             decoration: InputDecoration(
               labelText: '接口地址',
-              hintText: 'http://your-server:port',
+              hintText: 'your-server:port（默认 http://）',
               prefixIcon: const Icon(Icons.link_rounded, size: 20),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               focusedBorder: OutlineInputBorder(
