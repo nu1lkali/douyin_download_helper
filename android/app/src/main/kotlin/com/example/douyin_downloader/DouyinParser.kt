@@ -117,12 +117,28 @@ object DouyinParser {
 
         val title = item.optString("desc", "")
         val authorName = author?.optString("nickname", "") ?: ""
-        val shortId = author?.optString("short_id", "") ?: ""
+        val shortId = author?.optString("short_id", "").let {
+            if (!it.isNullOrEmpty() && it != "0") it
+            else author?.optString("unique_id", "") ?: ""
+        }
+        val createTime = item.optLong("create_time", 0)
+        val statistics = item.optJSONObject("statistics")
+        val likeCount = statistics?.optLong("digg_count", 0) ?: 0
+
+        // 音乐
+        val music = item.optJSONObject("music")
+        val musicTitle = music?.optString("title", "") ?: ""
+        val musicAuthor = music?.optString("author", "") ?: ""
+        val musicPlayUrl = music?.optJSONObject("play_url")
+        val musicUrlList = musicPlayUrl?.optJSONArray("url_list")
+        val musicUrl = if (musicUrlList != null && musicUrlList.length() > 0) musicUrlList.getString(0) else ""
 
         // 无水印视频URL
         var videoUrl = ""
         var cover = ""
+        var duration = 0
         if (!isImage && video != null) {
+            duration = video.optInt("duration", 0)
             // 提取封面图
             val coverInfo = video.optJSONObject("cover")
             val coverUrlList = coverInfo?.optJSONArray("url_list")
@@ -170,6 +186,12 @@ object DouyinParser {
             videoUrl = videoUrl,
             images = images,
             cover = cover,
+            like = likeCount,
+            time = createTime,
+            duration = duration,
+            musicTitle = musicTitle,
+            musicAuthor = musicAuthor,
+            musicUrl = musicUrl,
         )
     }
 
