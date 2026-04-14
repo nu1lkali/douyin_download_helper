@@ -40,7 +40,16 @@ class FloatingWindowService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        isCompactMode = intent?.getBooleanExtra("compact_mode", false) ?: false
+        val prefs = getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
+        if (intent != null) {
+            // 正常启动时，保存 compact_mode 到 prefs，供 Service 重启时恢复
+            val compact = intent.getBooleanExtra("compact_mode", false)
+            prefs.edit().putBoolean("floating_compact_mode", compact).apply()
+            isCompactMode = compact
+        } else {
+            // Service 被系统重启（intent 为 null），从 prefs 恢复
+            isCompactMode = prefs.getBoolean("floating_compact_mode", false)
+        }
         return START_STICKY
     }
 
