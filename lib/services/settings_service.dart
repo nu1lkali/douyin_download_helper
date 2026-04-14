@@ -1,7 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum ParseMode { remote, local }
-enum RemoteApi { hk0, xinyew, selfHosted }
+enum ParseMode { selfHosted, local }
 
 class SettingsService {
   static const _keyFloatingWindow = 'floating_window_enabled';
@@ -11,8 +10,7 @@ class SettingsService {
   static const _keyFloatingCompact = 'floating_compact_mode';
   static const _keyGroupByAuthor = 'group_by_author';
   static const _keyCompactAutoClose = 'compact_auto_close';
-  static const _keyCompactAutoCloseDelay = 'compact_auto_close_delay'; // 0=立即, 3=3秒, 5=5秒, -1=不关闭
-  static const _keyRemoteApi = 'remote_api';
+  static const _keyCompactAutoCloseDelay = 'compact_auto_close_delay';
   static const _keySelfHostedUrl = 'self_hosted_url';
   static const _keySelfHostedToken = 'self_hosted_token';
 
@@ -38,13 +36,13 @@ class SettingsService {
 
   static Future<ParseMode> getParseMode() async {
     final prefs = await SharedPreferences.getInstance();
-    final val = prefs.getString(_keyParseMode) ?? 'remote';
-    return val == 'local' ? ParseMode.local : ParseMode.remote;
+    final val = prefs.getString(_keyParseMode) ?? 'self';
+    return val == 'local' ? ParseMode.local : ParseMode.selfHosted;
   }
 
   static Future<void> setParseMode(ParseMode mode) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_keyParseMode, mode == ParseMode.local ? 'local' : 'remote');
+    await prefs.setString(_keyParseMode, mode == ParseMode.local ? 'local' : 'self');
   }
 
   static Future<String> getCookie() async {
@@ -100,24 +98,6 @@ class SettingsService {
     await prefs.setBool(_keyCompactAutoClose, seconds >= 0);
   }
 
-  static Future<RemoteApi> getRemoteApi() async {
-    final prefs = await SharedPreferences.getInstance();
-    switch (prefs.getString(_keyRemoteApi) ?? 'hk0') {
-      case 'xinyew': return RemoteApi.xinyew;
-      case 'self': return RemoteApi.selfHosted;
-      default: return RemoteApi.hk0;
-    }
-  }
-
-  static Future<void> setRemoteApi(RemoteApi api) async {
-    final prefs = await SharedPreferences.getInstance();
-    final val = switch (api) {
-      RemoteApi.xinyew => 'xinyew',
-      RemoteApi.selfHosted => 'self',
-      _ => 'hk0',
-    };
-    await prefs.setString(_keyRemoteApi, val);
-  }
 
   static Future<String> getSelfHostedUrl() async {
     final prefs = await SharedPreferences.getInstance();

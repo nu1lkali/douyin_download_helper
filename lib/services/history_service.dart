@@ -11,6 +11,24 @@ class HistoryService {
       final historyJson = prefs.getString(_key);
       List<dynamic> history = historyJson != null ? json.decode(historyJson) : [];
       
+      // 去重：移除相同的记录
+      history = history.where((item) {
+        final existing = VideoInfo.fromJson(item as Map<String, dynamic>);
+        // 视频：通过 videoUrl 去重
+        if (video.isVideo) {
+          return existing.url != video.url;
+        }
+        // 图集：通过第一张图片 URL 去重
+        else {
+          final existingImages = existing.imageList;
+          final videoImages = video.imageList;
+          if (existingImages.isEmpty || videoImages.isEmpty) {
+            return true;
+          }
+          return existingImages[0] != videoImages[0];
+        }
+      }).toList();
+      
       history.insert(0, video.toJson());
       
       if (history.length > 100) {
@@ -26,6 +44,7 @@ class HistoryService {
   Future<List<VideoInfo>> getHistory() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      await prefs.reload(); // 强制从磁盘重新加载，确保能读到 Kotlin 侧写入的数据
       final historyJson = prefs.getString(_key);
       if (historyJson == null) return [];
       
@@ -34,6 +53,13 @@ class HistoryService {
     } catch (e) {
       return [];
     }
+  }
+
+  Future<void> clearHistory() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_key);
+    } catch (e) {}
   }
 
   Future<void> deleteHistory(int index) async {

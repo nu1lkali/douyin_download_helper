@@ -15,11 +15,18 @@ object DouyinParser {
         val author: String,
         val videoUrl: String,
         val images: List<String>,
+        val cover: String = "",
         val shortId: String = "",
         val isLive: Boolean = false,
         val albumName: String = "便捷下载",
+        val avatar: String = "",
+        val like: Long = 0,
+        val time: Long = 0,
+        val duration: Int = 0,
+        val musicTitle: String = "",
+        val musicAuthor: String = "",
+        val musicUrl: String = "",
     ) {
-        // 视频或实况都走视频下载逻辑
         val isVideo get() = images.isEmpty() || isLive
     }
 
@@ -114,7 +121,16 @@ object DouyinParser {
 
         // 无水印视频URL
         var videoUrl = ""
+        var cover = ""
         if (!isImage && video != null) {
+            // 提取封面图
+            val coverInfo = video.optJSONObject("cover")
+            val coverUrlList = coverInfo?.optJSONArray("url_list")
+            if (coverUrlList != null && coverUrlList.length() > 0) {
+                cover = coverUrlList.getString(0)
+            }
+            
+            // 提取视频URL
             val playAddr = video.optJSONObject("play_addr")
             val urlList = playAddr?.optJSONArray("url_list")
             if (urlList != null && urlList.length() > 0) {
@@ -153,6 +169,7 @@ object DouyinParser {
             shortId = shortId,
             videoUrl = videoUrl,
             images = images,
+            cover = cover,
         )
     }
 

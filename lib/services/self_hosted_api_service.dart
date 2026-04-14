@@ -104,13 +104,21 @@ class SelfHostedApiService {
           ? '实况:${allClips.join('\n')}'
           : '当前为短视频解析模式';
     } else {
+      // 图集类型
       images = (downloads as List?)?.map((e) => e.toString()).toList() ?? [];
       videoUrl = '';
     }
 
-    final cover = (d['static_cover'] as String?)?.isNotEmpty == true
-        ? d['static_cover'] as String
-        : (d['dynamic_cover'] as String? ?? '');
+    String cover;
+    if (!isVideo && !isLive && images is List && (images as List).isNotEmpty) {
+      // 图集类型使用第一张图作为缩略图
+      cover = (images as List)[0] as String;
+    } else {
+      // 其他类型保持原逻辑
+      cover = (d['static_cover'] as String?)?.isNotEmpty == true
+          ? d['static_cover'] as String
+          : (d['dynamic_cover'] as String? ?? '');
+    }
 
     return VideoInfo.fromJson({
       'author': d['nickname'] ?? '',

@@ -18,7 +18,7 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
   bool _floatingCompact = false;
   final _albumController = TextEditingController();
   final _cookieController = TextEditingController();
-  ParseMode _parseMode = ParseMode.remote;
+  ParseMode _parseMode = ParseMode.selfHosted;
   bool _showCookie = false;
 
   static const _primary = Color(0xFF1677FF);
@@ -140,10 +140,10 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
           _card(child: Column(
             children: [
               _modeOption(
-                title: '远程 API',
-                subtitle: '使用第三方接口解析，无需 Cookie，稳定性依赖服务商',
-                value: ParseMode.remote,
-                icon: Icons.cloud_rounded,
+                title: '自建接口',
+                subtitle: '使用自建服务解析，需配置接口地址和 Token',
+                value: ParseMode.selfHosted,
+                icon: Icons.dns_rounded,
               ),
               const Divider(height: 1, indent: 56),
               _modeOption(
@@ -155,11 +155,11 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
             ],
           )),
 
-          // 远程模式时显示接口选择
-          if (_parseMode == ParseMode.remote) ...[
+          // 自建接口模式时显示配置
+          if (_parseMode == ParseMode.selfHosted) ...[
             const SizedBox(height: 12),
-            _sectionLabel('远程接口'),
-            _card(child: _RemoteApiSelector(primary: _primary)),
+            _sectionLabel('自建接口配置'),
+            _card(child: _SelfHostedConfig(primary: _primary)),
           ],
 
           const SizedBox(height: 20),
@@ -671,95 +671,6 @@ class _SelfHostedConfigState extends State<_SelfHostedConfig> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-// 远程接口选择器
-class _RemoteApiSelector extends StatefulWidget {
-  final Color primary;
-  const _RemoteApiSelector({required this.primary});
-
-  @override
-  State<_RemoteApiSelector> createState() => _RemoteApiSelectorState();
-}
-
-class _RemoteApiSelectorState extends State<_RemoteApiSelector> {
-  RemoteApi _api = RemoteApi.hk0;
-
-  @override
-  void initState() {
-    super.initState();
-    SettingsService.getRemoteApi().then((v) => setState(() => _api = v));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _apiOption(
-          title: 'api.hk0.cc',
-          subtitle: '返回完整信息（封面、点赞数、音乐等）',
-          value: RemoteApi.hk0,
-        ),
-        const Divider(height: 1, indent: 16, endIndent: 16),
-        _apiOption(
-          title: 'api.xinyew.cn',
-          subtitle: '备用接口，字段较少（无封面、点赞数）',
-          value: RemoteApi.xinyew,
-        ),
-        const Divider(height: 1, indent: 16, endIndent: 16),
-        _apiOption(
-          title: '自建接口',
-          subtitle: '带 Cookie 请求，数据最完整，支持图集/实况',
-          value: RemoteApi.selfHosted,
-        ),
-        if (_api == RemoteApi.selfHosted) ...[
-          const Divider(height: 1),
-          _SelfHostedConfig(primary: widget.primary),
-        ],
-      ],
-    );
-  }
-
-  Widget _apiOption({required String title, required String subtitle, required RemoteApi value}) {
-    final selected = _api == value;
-    return InkWell(
-      onTap: () async {
-        await SettingsService.setRemoteApi(value);
-        setState(() => _api = value);
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    color: selected ? widget.primary : Colors.black87,
-                  )),
-                  const SizedBox(height: 2),
-                  Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
-                ],
-              ),
-            ),
-            Radio<RemoteApi>(
-              value: value,
-              groupValue: _api,
-              activeColor: widget.primary,
-              onChanged: (v) async {
-                if (v != null) {
-                  await SettingsService.setRemoteApi(v);
-                  setState(() => _api = v);
-                }
-              },
-            ),
-          ],
-        ),
       ),
     );
   }

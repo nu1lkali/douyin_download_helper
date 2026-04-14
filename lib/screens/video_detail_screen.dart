@@ -230,9 +230,14 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                     Row(
                       children: [
                         CircleAvatar(
-                          backgroundImage: NetworkImage(widget.videoInfo.avatar),
+                          backgroundImage: widget.videoInfo.avatar.isNotEmpty
+                              ? NetworkImage(widget.videoInfo.avatar)
+                              : null,
                           radius: 18,
                           backgroundColor: Colors.grey[200],
+                          child: widget.videoInfo.avatar.isEmpty
+                              ? const Icon(Icons.person, size: 20, color: Colors.grey)
+                              : null,
                         ),
                         const SizedBox(width: 8),
                         Expanded(

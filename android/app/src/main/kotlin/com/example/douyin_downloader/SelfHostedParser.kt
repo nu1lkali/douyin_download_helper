@@ -31,6 +31,8 @@ object SelfHostedParser {
         val downloads = d.opt("downloads")
         var videoUrl = ""
         val images = mutableListOf<String>()
+        // 自建接口封面字段：视频用 static_cover/dynamic_cover，图集用第一张图
+        var cover = d.optString("static_cover", "").ifEmpty { d.optString("dynamic_cover", "") }
 
         when {
             isVideo -> videoUrl = downloads as? String ?: ""
@@ -56,6 +58,10 @@ object SelfHostedParser {
                 if (arr != null) {
                     for (i in 0 until arr.length()) images.add(arr.getString(i))
                 }
+                // 图集使用第一张图作为封面
+                if (images.isNotEmpty() && cover.isEmpty()) {
+                    cover = images[0]
+                }
             }
         }
 
@@ -65,8 +71,26 @@ object SelfHostedParser {
             shortId = d.optString("uid", ""),
             videoUrl = videoUrl,
             images = images,
+            cover = cover,
             isLive = isLive,
+            like = d.optLong("digg_count", 0),
+            time = d.optLong("create_timestamp", 0),
+            duration = parseDuration(d.optString("duration", "")),
+            musicTitle = d.optString("music_title", ""),
+            musicAuthor = d.optString("music_author", ""),
+            musicUrl = d.optString("music_url", ""),
         )
+    }
+
+    private fun parseDuration(s: String): Int {
+        return try {
+            val parts = s.split(":").map { it.toInt() }
+            when (parts.size) {
+                3 -> (parts[0] * 3600 + parts[1] * 60 + parts[2]) * 1000
+                2 -> (parts[0] * 60 + parts[1]) * 1000
+                else -> 0
+            }
+        } catch (_: Exception) { 0 }
     }
 
     private fun postJson(url: String, token: String, body: String): String {

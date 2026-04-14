@@ -19,6 +19,8 @@ import android.os.Looper
 import android.provider.MediaStore
 import android.view.*
 import android.widget.*
+import io.flutter.app.FlutterApplication
+import io.flutter.plugin.common.MethodChannel
 import java.io.File
 import java.io.FileOutputStream
 import java.net.HttpURLConnection
@@ -159,9 +161,12 @@ class FloatingWindowService : Service() {
             tvStatus.text = "正在解析..."
             progress.visibility = View.VISIBLE
 
+            // 直接在 Kotlin 侧解析完成后，通过 SharedPreferences 保存历史记录
             Thread {
                 try {
                     val result = parseWithSettings(clipText)
+                    // 通知 Flutter 侧写入历史记录
+                    notifyFlutterHistory(result)
                     safePost {
                         progress.visibility = View.GONE
                         tvStatus.text = "解析成功"
@@ -311,6 +316,8 @@ class FloatingWindowService : Service() {
                     }
                 }
             }.start()
+            
+
         }, 200) // 等200ms让窗口获得焦点
     }
 
@@ -351,18 +358,16 @@ class FloatingWindowService : Service() {
     /** 根据设置选择解析方式 */
     private fun parseWithSettings(text: String): DouyinParser.ParseResult {
         val prefs = getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
-        val parseMode = prefs.getString("flutter.parse_mode", "remote") ?: "remote"
-        val remoteApi = prefs.getString("flutter.remote_api", "hk0") ?: "hk0"
+        val parseMode = prefs.getString("flutter.parse_mode", "self") ?: "self"
         val cookie = prefs.getString("flutter.douyin_cookie", "") ?: ""
 
-        // 检查缓存（以输入文本为key，缓存30分钟）
-        val cacheKey = "$parseMode:$remoteApi:$text"
+        val cacheKey = "$parseMode:$text"
         val cached = ParseCache.get(cacheKey)
         if (cached != null) return cached
 
-        val result = when {
-            parseMode == "local" -> DouyinParser.parse(text)
-            remoteApi == "self" -> {
+        val result = when (parseMode) {
+            "local" -> DouyinParser.parse(text)
+            else -> {
                 val baseUrl = (prefs.getString("flutter.self_hosted_url", "") ?: "").trimEnd('/')
                 val token = prefs.getString("flutter.self_hosted_token", "") ?: ""
                 if (baseUrl.isNotEmpty() && token.isNotEmpty()) {
@@ -371,8 +376,6 @@ class FloatingWindowService : Service() {
                     throw Exception("自建接口未配置地址或Token，请在设置中填写")
                 }
             }
-            remoteApi == "xinyew" -> RemoteParser.parseXinyew(text)
-            else -> RemoteParser.parseHk0(text)
         }
 
         ParseCache.put(cacheKey, result)
@@ -387,7 +390,7 @@ class FloatingWindowService : Service() {
         if (groupByAuthor && author.isNotEmpty()) {
             val folderName = if (shortId.isNotEmpty()) "$author($shortId)" else author
             // 清理非法字符，保留括号
-            val safeFolder = folderName.replace(Regex("[*?\"<>|\\\\/:]+"), "_")
+            val safeFolder = folderName.replace(Regex("[*?\"<>|\\/:]+"), "_")
             return "$albumName/$safeFolder"
         }
         return albumName
@@ -491,6 +494,98 @@ class FloatingWindowService : Service() {
         if (delay < 0) return
         val delayMs = maxOf(delay * 1000L, 1000L) // 最少1秒，防止崩溃
         mainHandler.postDelayed({ dismissCompactPanel() }, delayMs)
+    }
+
+    /** 解析成功后通过 MethodChannel 通知 Flutter 侧写入历史记录，或直接写 SharedPreferences */
+    private fun notifyFlutterHistory(result: DouyinParser.ParseResult) {
+        // 无论 app 是否在前台，都先直接写 SharedPreferences（最可靠）
+        saveHistoryToPrefs(result)
+        // 如果 app 在前台，额外通过 MethodChannel 通知（让历史页面实时刷新）
+        if (MainActivity.instance != null) {
+            try {
+                val imagesValue: Any = when {
+                    result.isLive -> "实况:${result.images.joinToString("\n")}"
+                    result.isVideo -> "当前为短视频解析模式"
+                    else -> result.images
+                }
+                val args = mapOf(
+                    "author" to result.author,
+                    "uid" to result.shortId,
+                    "avatar" to result.avatar,
+                    "like" to result.like,
+                    "time" to result.time,
+                    "title" to result.title,
+                    "cover" to result.cover,
+                    "images" to imagesValue,
+                    "url" to result.videoUrl,
+                    "duration" to result.duration,
+                    "music" to mapOf(
+                        "title" to result.musicTitle,
+                        "author" to result.musicAuthor,
+                        "avatar" to "",
+                        "url" to result.musicUrl
+                    )
+                )
+                MainActivity.invokeFlutter("addHistory", args)
+            } catch (_: Exception) {}
+        }
+    }
+
+    /** 直接写入 SharedPreferences，与 Flutter HistoryService 格式完全一致 */
+    private fun saveHistoryToPrefs(result: DouyinParser.ParseResult) {
+        try {
+            val prefs = getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
+            val key = "flutter.download_history"
+            val existing = prefs.getString(key, "[]") ?: "[]"
+            val history = org.json.JSONArray(existing)
+
+            val imagesJson: Any = when {
+                result.isLive -> "实况:${result.images.joinToString("\n")}"
+                result.isVideo -> "当前为短视频解析模式"
+                else -> org.json.JSONArray(result.images)
+            }
+
+            val item = org.json.JSONObject().apply {
+                put("author", result.author)
+                put("uid", result.shortId)
+                put("avatar", result.avatar)
+                put("like", result.like)
+                put("time", result.time)
+                put("title", result.title)
+                put("cover", result.cover)
+                put("images", imagesJson)
+                put("url", result.videoUrl)
+                put("duration", result.duration)
+                put("music", org.json.JSONObject().apply {
+                    put("title", result.musicTitle)
+                    put("author", result.musicAuthor)
+                    put("avatar", "")
+                    put("url", result.musicUrl)
+                })
+            }
+
+            // 去重 + 插入到最前面
+            val deduped = org.json.JSONArray()
+            deduped.put(item)
+            for (i in 0 until history.length()) {
+                val existing_item = history.getJSONObject(i)
+                val isDuplicate = if (result.isVideo) {
+                    existing_item.optString("url") == result.videoUrl && result.videoUrl.isNotEmpty()
+                } else {
+                    val existingImages = existing_item.opt("images")
+                    val firstExisting = if (existingImages is org.json.JSONArray && existingImages.length() > 0)
+                        existingImages.getString(0) else ""
+                    val firstNew = result.images.firstOrNull() ?: ""
+                    firstExisting.isNotEmpty() && firstExisting == firstNew
+                }
+                if (!isDuplicate) deduped.put(existing_item)
+                if (deduped.length() >= 100) break
+            }
+
+            prefs.edit().putString(key, deduped.toString()).apply()
+        } catch (e: Exception) {
+            android.util.Log.e("FloatingWindow", "saveHistoryToPrefs failed: ${e.message}", e)
+        }
     }
 
     private fun dismissCompactPanel() {

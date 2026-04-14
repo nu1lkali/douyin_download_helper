@@ -16,6 +16,39 @@ import java.io.FileInputStream
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "com.example.douyin_downloader/floating"
 
+    companion object {
+        // 暴露给 FloatingWindowService 直接调用
+        var instance: MainActivity? = null
+        fun invokeFlutter(method: String, args: Any?) {
+            instance?.flutterEngine?.dartExecutor?.binaryMessenger?.let {
+                android.os.Handler(android.os.Looper.getMainLooper()).post {
+                    MethodChannel(it, "com.example.douyin_downloader/floating")
+                        .invokeMethod(method, args)
+                }
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        instance = this
+        // 处理 app 不在前台时积压的历史记录
+        flushPendingHistory()
+    }
+    override fun onDestroy() { super.onDestroy(); if (instance == this) instance = null }
+
+    /** 将 FloatingWindowService 积压的历史记录发给 Flutter */
+    private fun flushPendingHistory() {
+        val prefs = getSharedPreferences("floating_pending", android.content.Context.MODE_PRIVATE)
+        val pending = prefs.getString("pending_history", null) ?: return
+        prefs.edit().remove("pending_history").apply()
+        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+            flutterEngine?.dartExecutor?.binaryMessenger?.let {
+                MethodChannel(it, CHANNEL).invokeMethod("addHistoryBatch", pending)
+            }
+        }, 500)
+    }
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 

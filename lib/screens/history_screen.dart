@@ -159,9 +159,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               child: ElevatedButton(
                                 onPressed: () async {
                                   Navigator.pop(context);
-                                  for (int i = _history.length - 1; i >= 0; i--) {
-                                    await _historyService.deleteHistory(i);
-                                  }
+                                  await _historyService.clearHistory();
                                   _loadHistory();
                                 },
                                 style: ElevatedButton.styleFrom(
