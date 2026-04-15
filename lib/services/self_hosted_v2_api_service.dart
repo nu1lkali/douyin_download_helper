@@ -91,30 +91,35 @@ class SelfHostedV2ApiService {
     dynamic images;
     if (isImage) {
       final rawImages = item['images'] as List? ?? [];
-      // 实况：每个 image 有 video 字段
-      final isLive = rawImages.isNotEmpty &&
-          (rawImages[0] as Map?)?.containsKey('video') == true &&
-          ((rawImages[0] as Map)['video'] as Map?)?.isNotEmpty == true;
+      // 实况：每个 image 有 video 字段且 play_addr.url_list 有内容
+      final isLive = rawImages.isNotEmpty && (() {
+        final firstImg = rawImages[0] as Map<String, dynamic>;
+        final v = (firstImg['video'] as Map?)?.cast<String, dynamic>() ?? {};
+        final pa = (v['play_addr'] as Map?)?.cast<String, dynamic>() ?? {};
+        final ul = (pa['url_list'] as List?) ?? [];
+        return ul.isNotEmpty;
+      })();
 
       if (isLive) {
-        // 实况：收集每个 clip 的视频 URL + 静态图 URL
+        // 混合实况：每个 image 单独判断，有 video 取视频片段，没有取静图
         final clips = <String>[];
+        final staticImgs = <String>[];
         for (final img in rawImages) {
           final imgMap = img as Map<String, dynamic>;
           final clipVideo = (imgMap['video'] as Map?)?.cast<String, dynamic>() ?? {};
           final clipPlayAddr = (clipVideo['play_addr'] as Map?)?.cast<String, dynamic>() ?? {};
           final clipUrls = (clipPlayAddr['url_list'] as List?) ?? [];
-          if (clipUrls.isNotEmpty) clips.add(clipUrls[0] as String);
-        }
-        // 再收集静态图
-        final staticImgs = <String>[];
-        for (final img in rawImages) {
-          final imgMap = img as Map<String, dynamic>;
-          final imgUrls = (imgMap['url_list'] as List?) ?? [];
-          if (imgUrls.isNotEmpty) staticImgs.add(imgUrls[0] as String);
+          if (clipUrls.isNotEmpty) {
+            // 有视频片段
+            clips.add(clipUrls[0] as String);
+          } else {
+            // 普通静图
+            final imgUrls = (imgMap['url_list'] as List?) ?? [];
+            if (imgUrls.isNotEmpty) staticImgs.add(imgUrls[0] as String);
+          }
         }
         final allClips = [...clips, ...staticImgs];
-        images = allClips.length > 1 ? '实况:${allClips.join('\n')}' : '当前为短视频解析模式';
+        images = allClips.isNotEmpty ? '实况:${allClips.join('\n')}' : '当前为短视频解析模式';
         videoUrl = clips.isNotEmpty ? clips[0] : '';
       } else {
         // 普通图集

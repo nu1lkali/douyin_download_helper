@@ -31,8 +31,8 @@ object SelfHostedParser {
         val downloads = d.opt("downloads")
         var videoUrl = ""
         val images = mutableListOf<String>()
-        // 自建接口封面字段：视频用 static_cover/dynamic_cover，图集用第一张图
-        var cover = d.optString("static_cover", "").ifEmpty { d.optString("dynamic_cover", "") }
+        // 自建接口封面字段：视频用 static_cover/dynamic_cover，图集用第一张图，实况留空
+        var cover = if (isLive) "" else d.optString("static_cover", "").ifEmpty { d.optString("dynamic_cover", "") }
 
         when {
             isVideo -> videoUrl = downloads as? String ?: ""

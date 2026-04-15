@@ -68,29 +68,33 @@ object SelfHostedV2Parser {
             val rawImages = item.optJSONArray("images")
             if (rawImages != null && rawImages.length() > 0) {
                 val firstImg = rawImages.getJSONObject(0)
-                val hasVideo = firstImg.has("video") && !firstImg.isNull("video") &&
-                               firstImg.optJSONObject("video")?.length() ?: 0 > 0
+                // 判断实况：第一个 image 的 video.play_addr.url_list 有内容
+                val firstVideo = firstImg.optJSONObject("video")
+                val firstPlayAddr = firstVideo?.optJSONObject("play_addr")
+                val firstVideoUrls = firstPlayAddr?.optJSONArray("url_list")
+                val hasVideo = firstVideoUrls != null && firstVideoUrls.length() > 0
                 if (hasVideo) {
                     isLive = true
                     val videoClips = mutableListOf<String>()
                     val staticImgs = mutableListOf<String>()
                     for (i in 0 until rawImages.length()) {
                         val img = rawImages.getJSONObject(i)
+                        // 每个 image 单独判断：有视频片段取视频，没有取静图
                         val clipVideo = img.optJSONObject("video")
                         val clipPlayAddr = clipVideo?.optJSONObject("play_addr")
                         val clipUrls = clipPlayAddr?.optJSONArray("url_list")
                         if (clipUrls != null && clipUrls.length() > 0) {
                             videoClips.add(clipUrls.getString(0))
-                        }
-                        val imgUrls = img.optJSONArray("url_list")
-                        if (imgUrls != null && imgUrls.length() > 0) {
-                            staticImgs.add(imgUrls.getString(0))
+                        } else {
+                            val imgUrls = img.optJSONArray("url_list")
+                            if (imgUrls != null && imgUrls.length() > 0) {
+                                staticImgs.add(imgUrls.getString(0))
+                            }
                         }
                     }
                     images.addAll(videoClips)
                     images.addAll(staticImgs)
                     videoUrl = videoClips.firstOrNull() ?: ""
-                    // 封面用第一张静态图
                     if (cover.isEmpty()) cover = staticImgs.firstOrNull() ?: ""
                 } else {
                     for (i in 0 until rawImages.length()) {
