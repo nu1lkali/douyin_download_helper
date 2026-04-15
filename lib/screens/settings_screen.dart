@@ -147,6 +147,13 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
               ),
               const Divider(height: 1, indent: 56),
               _modeOption(
+                title: '自建接口 V2',
+                subtitle: '新版接口，返回原始抖音数据，字段更完整',
+                value: ParseMode.selfHostedV2,
+                icon: Icons.dns_rounded,
+              ),
+              const Divider(height: 1, indent: 56),
+              _modeOption(
                 title: '本地解析',
                 subtitle: '直接请求抖音接口，需要配置 Cookie 以提高成功率',
                 value: ParseMode.local,
@@ -160,6 +167,13 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
             const SizedBox(height: 12),
             _sectionLabel('自建接口配置'),
             _card(child: _SelfHostedConfig(primary: _primary)),
+          ],
+
+          // V2 接口模式时显示配置
+          if (_parseMode == ParseMode.selfHostedV2) ...[
+            const SizedBox(height: 12),
+            _sectionLabel('自建接口 V2 配置'),
+            _card(child: _SelfHostedV2Config(primary: _primary)),
           ],
 
           const SizedBox(height: 20),
@@ -568,6 +582,108 @@ class _LogScreenState extends State<_LogScreen> {
             height: 1.5,
           ),
         ),
+      ),
+    );
+  }
+}
+
+// 自建接口 V2 配置
+class _SelfHostedV2Config extends StatefulWidget {
+  final Color primary;
+  const _SelfHostedV2Config({required this.primary});
+
+  @override
+  State<_SelfHostedV2Config> createState() => _SelfHostedV2ConfigState();
+}
+
+class _SelfHostedV2ConfigState extends State<_SelfHostedV2Config> {
+  final _urlCtrl = TextEditingController();
+  final _tokenCtrl = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    SettingsService.getSelfHostedV2Url().then((v) => _urlCtrl.text = v);
+    SettingsService.getSelfHostedV2Token().then((v) => _tokenCtrl.text = v);
+  }
+
+  @override
+  void dispose() {
+    _urlCtrl.dispose();
+    _tokenCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    var url = _urlCtrl.text.trim();
+    if (url.isNotEmpty && !url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'http://$url';
+      _urlCtrl.text = url;
+    }
+    await SettingsService.setSelfHostedV2Url(url);
+    await SettingsService.setSelfHostedV2Token(_tokenCtrl.text);
+    if (mounted) {
+      FocusScope.of(context).unfocus();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('自建接口 V2 配置已保存'), behavior: SnackBarBehavior.floating),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            controller: _urlCtrl,
+            decoration: InputDecoration(
+              labelText: '接口地址',
+              hintText: 'your-server:port（默认 http://）',
+              prefixIcon: const Icon(Icons.link_rounded, size: 20),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: widget.primary, width: 2),
+              ),
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: _tokenCtrl,
+            obscureText: true,
+            decoration: InputDecoration(
+              labelText: 'Token（可选）',
+              hintText: '如有鉴权 Token 请填写',
+              prefixIcon: const Icon(Icons.key_rounded, size: 20),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: widget.primary, width: 2),
+              ),
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            ),
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _save,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: widget.primary,
+                minimumSize: const Size(0, 42),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                elevation: 0,
+              ),
+              child: const Text('保存配置'),
+            ),
+          ),
+        ],
       ),
     );
   }

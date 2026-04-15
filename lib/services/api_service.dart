@@ -2,15 +2,14 @@ import '../models/video_info.dart';
 import 'settings_service.dart';
 import 'local_parser_service.dart';
 import 'self_hosted_api_service.dart';
+import 'self_hosted_v2_api_service.dart';
 import 'log_service.dart';
 
 class ApiService {
-  // 内存缓存：key=链接, value={'data': VideoInfo, 'expire': DateTime}
   static final Map<String, Map<String, dynamic>> _cache = {};
   static const _cacheDuration = Duration(minutes: 30);
 
   static Future<VideoInfo> parseVideo(String url) async {
-    // 检查缓存
     final cached = _cache[url];
     if (cached != null && (cached['expire'] as DateTime).isAfter(DateTime.now())) {
       await LogService.log('ApiService', 'cache hit: $url');
@@ -22,10 +21,13 @@ class ApiService {
 
     try {
       final VideoInfo result;
-      if (mode == ParseMode.local) {
-        result = await _parseLocal(url);
-      } else {
-        result = await SelfHostedApiService.parse(url);
+      switch (mode) {
+        case ParseMode.local:
+          result = await _parseLocal(url);
+        case ParseMode.selfHostedV2:
+          result = await SelfHostedV2ApiService.parse(url);
+        default:
+          result = await SelfHostedApiService.parse(url);
       }
       _cache[url] = {'data': result, 'expire': DateTime.now().add(_cacheDuration)};
       return result;

@@ -1,6 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum ParseMode { selfHosted, local }
+enum ParseMode { selfHosted, selfHostedV2, local }
 
 class SettingsService {
   static const _keyFloatingWindow = 'floating_window_enabled';
@@ -13,6 +13,8 @@ class SettingsService {
   static const _keyCompactAutoCloseDelay = 'compact_auto_close_delay';
   static const _keySelfHostedUrl = 'self_hosted_url';
   static const _keySelfHostedToken = 'self_hosted_token';
+  static const _keySelfHostedV2Url = 'self_hosted_v2_url';
+  static const _keySelfHostedV2Token = 'self_hosted_v2_token';
 
   static Future<bool> getFloatingWindowEnabled() async {
     final prefs = await SharedPreferences.getInstance();
@@ -37,12 +39,21 @@ class SettingsService {
   static Future<ParseMode> getParseMode() async {
     final prefs = await SharedPreferences.getInstance();
     final val = prefs.getString(_keyParseMode) ?? 'self';
-    return val == 'local' ? ParseMode.local : ParseMode.selfHosted;
+    switch (val) {
+      case 'local': return ParseMode.local;
+      case 'self_v2': return ParseMode.selfHostedV2;
+      default: return ParseMode.selfHosted;
+    }
   }
 
   static Future<void> setParseMode(ParseMode mode) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_keyParseMode, mode == ParseMode.local ? 'local' : 'self');
+    final val = switch (mode) {
+      ParseMode.local => 'local',
+      ParseMode.selfHostedV2 => 'self_v2',
+      _ => 'self',
+    };
+    await prefs.setString(_keyParseMode, val);
   }
 
   static Future<String> getCookie() async {
@@ -117,5 +128,25 @@ class SettingsService {
   static Future<void> setSelfHostedToken(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keySelfHostedToken, value.trim());
+  }
+
+  static Future<String> getSelfHostedV2Url() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keySelfHostedV2Url) ?? '';
+  }
+
+  static Future<void> setSelfHostedV2Url(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keySelfHostedV2Url, value.trim());
+  }
+
+  static Future<String> getSelfHostedV2Token() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keySelfHostedV2Token) ?? '';
+  }
+
+  static Future<void> setSelfHostedV2Token(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keySelfHostedV2Token, value.trim());
   }
 }

@@ -367,6 +367,15 @@ class FloatingWindowService : Service() {
 
         val result = when (parseMode) {
             "local" -> DouyinParser.parse(text)
+            "self_v2" -> {
+                val baseUrl = (prefs.getString("flutter.self_hosted_v2_url", "") ?: "").trimEnd('/')
+                val token = prefs.getString("flutter.self_hosted_v2_token", "") ?: ""
+                if (baseUrl.isNotEmpty()) {
+                    SelfHostedV2Parser.parse(text, baseUrl, token, cookie)
+                } else {
+                    throw Exception("自建接口 V2 未配置地址，请在设置中填写")
+                }
+            }
             else -> {
                 val baseUrl = (prefs.getString("flutter.self_hosted_url", "") ?: "").trimEnd('/')
                 val token = prefs.getString("flutter.self_hosted_token", "") ?: ""
@@ -429,7 +438,10 @@ class FloatingWindowService : Service() {
 
     private fun downloadUrl(url: String, dest: File, onProgress: ((Long, Long) -> Unit)? = null) {
         val conn = URL(url).openConnection() as HttpURLConnection
-        conn.setRequestProperty("User-Agent", DouyinParser.UA)
+        // 抖音视频下载需要带浏览器请求头，否则 403
+        conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36")
+        conn.setRequestProperty("Referer", "https://www.douyin.com/")
+        conn.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2")
         conn.connectTimeout = 30000
         conn.readTimeout = 60000
         conn.connect()

@@ -7,7 +7,13 @@ import 'floating_window_service.dart';
 import 'settings_service.dart';
 
 class DownloadService {
-  final Dio _dio = Dio();
+    final Dio _dio = Dio(BaseOptions(
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36',
+        'Referer': 'https://www.douyin.com/',
+        'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+      },
+    ));
 
   Future<bool> requestPermission() async {
     if (!Platform.isAndroid) return true;
