@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../models/video_info.dart';
 import '../services/history_service.dart';
 import 'video_detail_screen.dart';
@@ -202,6 +203,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   itemCount: _history.length,
                   itemBuilder: (context, index) {
                     final video = _history[index];
+                    final isLive = video.isLive;
                     final isImage = !video.isVideo;
                     return GestureDetector(
                       onLongPress: () => _confirmDelete(index),
@@ -233,31 +235,33 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                   children: [
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(10),
-                                      child: Image.network(
-                                        video.cover,
+                                      child: CachedNetworkImage(
+                                        imageUrl: video.cover,
                                         width: 72, height: 72,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (_, __, ___) => Container(
+                                        placeholder: (_, __) => Container(color: Colors.grey[200]),
+                                        errorWidget: (_, __, ___) => Container(
                                           width: 72, height: 72,
                                           color: Colors.grey[200],
-                                          child: const Icon(Icons.broken_image_rounded,
-                                            color: Colors.grey),
+                                          child: const Icon(Icons.broken_image_rounded, color: Colors.grey),
                                         ),
                                       ),
                                     ),
-                                    // 图集/视频标签
+                                    // 图集/视频/实况标签
                                     Positioned(
                                       bottom: 4, left: 4,
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                                         decoration: BoxDecoration(
-                                          color: isImage
-                                              ? Colors.purple.withOpacity(0.85)
-                                              : _primary.withOpacity(0.85),
+                                          color: isLive
+                                              ? Colors.orange.withOpacity(0.85)
+                                              : isImage
+                                                  ? Colors.purple.withOpacity(0.85)
+                                                  : _primary.withOpacity(0.85),
                                           borderRadius: BorderRadius.circular(4),
                                         ),
                                         child: Text(
-                                          isImage ? '图集' : '视频',
+                                          isLive ? '实况' : isImage ? '图集' : '视频',
                                           style: const TextStyle(
                                             color: Colors.white, fontSize: 10),
                                         ),
@@ -286,7 +290,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                         children: [
                                           CircleAvatar(
                                             backgroundImage: video.avatar.isNotEmpty
-                                                ? NetworkImage(video.avatar)
+                                                ? CachedNetworkImageProvider(video.avatar)
                                                 : null,
                                             radius: 9,
                                             backgroundColor: Colors.grey[200],

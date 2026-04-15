@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../models/video_info.dart';
 import '../services/download_service.dart';
 import '../services/history_service.dart';
@@ -452,11 +453,15 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.network(imageList[index], fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
+                  CachedNetworkImage(
+                    imageUrl: imageList[index],
+                    fit: BoxFit.cover,
+                    placeholder: (_, __) => Container(color: Colors.grey[200]),
+                    errorWidget: (_, __, ___) => Container(
                       color: Colors.grey[200],
                       child: const Icon(Icons.broken_image_rounded, color: Colors.grey),
-                    )),
+                    ),
+                  ),
                   Positioned(
                     bottom: 4, right: 4,
                     child: Container(
@@ -616,13 +621,11 @@ class _ImageViewerScreenState extends State<_ImageViewerScreen> {
             minScale: 0.5,
             maxScale: 4.0,
             child: Center(
-              child: Image.network(
-                widget.images[index],
+              child: CachedNetworkImage(
+                imageUrl: widget.images[index],
                 fit: BoxFit.contain,
-                loadingBuilder: (_, child, progress) => progress == null
-                    ? child
-                    : const Center(child: CircularProgressIndicator(color: Colors.white)),
-                errorBuilder: (_, __, ___) => const Icon(
+                placeholder: (_, __) => const Center(child: CircularProgressIndicator(color: Colors.white)),
+                errorWidget: (_, __, ___) => const Icon(
                   Icons.broken_image_rounded, color: Colors.white54, size: 64),
               ),
             ),
