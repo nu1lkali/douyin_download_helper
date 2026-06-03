@@ -24,22 +24,23 @@
 
 ### 链接解析
 支持多种抖音链接格式，自动识别并提取有效链接：
-| 格式 | 示例 |
-|------|------|
-| 分享口令（含内嵌短链） | `xxx https://v.douyin.com/xxx/ xxx` |
-| 短网址 | `https://v.douyin.com/xxx` |
-| 正常视频页 | `https://www.douyin.com/video/xxx` |
-| 发现页 | `https://www.douyin.com/discover?modal_id=xxx` |
-| 用户主页视频 | `https://www.douyin.com/user/xxx?modal_id=xxx` |
+
+| 格式               | 示例                                             |
+| :----------------- | :----------------------------------------------- |
+| 分享口令（含内嵌短链） | `xxx https://v.douyin.com/xxx/ xxx`          |
+| 短网址             | `https://v.douyin.com/xxx`                       |
+| 正常视频页         | `https://www.douyin.com/video/xxx`               |
+| 发现页             | `https://www.douyin.com/discover?modal_id=xxx`   |
+| 用户主页视频       | `https://www.douyin.com/user/xxx?modal_id=xxx`   |
 
 ### 解析模式
 应用提供三种视频解析模式，可在设置中自由切换：
 
-| 模式 | 说明 | 适用场景 |
-|------|------|----------|
-| **自建接口** | 使用自建后端服务解析，需配置接口地址和 Token | 有自己服务器的用户 |
-| **自建接口 V2** | 新版接口协议，返回原始抖音数据，字段更完整 | 需要更完整数据的用户 |
-| **本地解析** | 直接请求抖音接口，建议配置 Cookie 提高成功率 | 无服务器、希望本地运行的用户 |
+| 模式            | 说明                                         | 适用场景                     |
+| :-------------- | :------------------------------------------- | :--------------------------- |
+| **自建接口**    | 使用自建后端服务解析，需配置接口地址和 Token  | 有自己服务器的用户           |
+| **自建接口 V2** | 新版接口协议，返回原始抖音数据，字段更完整   | 需要更完整数据的用户         |
+| **本地解析**    | 直接请求抖音接口，建议配置 Cookie 提高成功率 | 无服务器、希望本地运行的用户 |
 
 ### 悬浮窗
 - **标准悬浮窗** — 点击悬浮球自动读取剪贴板并解析视频
@@ -71,34 +72,34 @@
 
 ```
 lib/
-├── main.dart                        # 应用入口，权限网关
+├── main.dart                            # 应用入口，权限网关
 ├── models/
-│   ├── video_info.dart              # 视频信息数据模型（Freezed）
-│   ├── video_info.freezed.dart      # Freezed 生成代码
-│   └── video_info.g.dart            # JSON 序列化生成代码
+│   ├── video_info.dart                  # 视频信息数据模型（Freezed）
+│   ├── video_info.freezed.dart          # Freezed 生成代码
+│   └── video_info.g.dart                # JSON 序列化生成代码
 ├── screens/
-│   ├── home_screen.dart             # 首页（链接输入、解析按钮）
-│   ├── video_detail_screen.dart     # 视频详情页（预览、下载）
-│   ├── history_screen.dart          # 解析历史页面
-│   └── settings_screen.dart         # 设置页面
+│   ├── home_screen.dart                 # 首页（链接输入、解析按钮）
+│   ├── video_detail_screen.dart         # 视频详情页（预览、下载）
+│   ├── history_screen.dart              # 解析历史页面
+│   └── settings_screen.dart             # 设置页面
 ├── services/
-│   ├── api_service.dart             # API 调度器（根据模式选择解析服务）
-│   ├── self_hosted_api_service.dart # 自建接口解析服务
-│   ├── self_hosted_v2_api_service.dart # 自建接口 V2 解析服务
-│   ├── local_parser_service.dart    # 本地解析服务
-│   ├── download_service.dart        # 文件下载服务（Dio）
-│   ├── floating_window_service.dart # 悬浮窗服务（MethodChannel 通信）
-│   ├── history_service.dart         # 历史记录服务
-│   ├── settings_service.dart        # 设置服务（SharedPreferences）
-│   ├── permission_service.dart      # 权限管理服务
-│   └── log_service.dart             # 调试日志服务
+│   ├── api_service.dart                 # API 调度器（根据模式选择解析服务）
+│   ├── self_hosted_api_service.dart     # 自建接口解析服务
+│   ├── self_hosted_v2_api_service.dart  # 自建接口 V2 解析服务
+│   ├── local_parser_service.dart        # 本地解析服务
+│   ├── download_service.dart            # 文件下载服务（Dio）
+│   ├── floating_window_service.dart     # 悬浮窗服务（MethodChannel 通信）
+│   ├── history_service.dart             # 历史记录服务
+│   ├── settings_service.dart            # 设置服务（SharedPreferences）
+│   ├── permission_service.dart          # 权限管理服务
+│   └── log_service.dart                 # 调试日志服务
 └── utils/
-    └── link_extractor.dart          # 链接提取工具（正则匹配）
+    └── link_extractor.dart              # 链接提取工具（正则匹配）
 
 android/
 └── app/src/main/kotlin/com/example/douyin_downloader/
-    ├── MainActivity.kt              # Android 主 Activity
-    └── FloatingWindowService.kt     # Android 原生悬浮窗服务
+    ├── MainActivity.kt                  # Android 主 Activity
+    └── FloatingWindowService.kt         # Android 原生悬浮窗服务
 ```
 
 ---
@@ -123,7 +124,7 @@ android/
 │  └─────────────┘    └──────┬────────────┬──────────┬───┘ │
 │                            │            │          │     │
 │              ┌─────────────▼──┐  ┌──────▼──────┐ ┌─▼───┐│
-              │SelfHostedApi   │  │SelfHostedV2 │ │Local││
+│              │SelfHostedApi   │  │SelfHostedV2 │ │Local││
 │              │Service         │  │ApiService   │ │Parse││
 │              │(自建接口)       │  │(自建接口V2)  │ │r    ││
 │              └────────────────┘  └─────────────┘ └─────┘│
@@ -209,7 +210,7 @@ POST {base_url}/douyin/share_detail
     "music_title": "音乐标题",
     "music_author": "音乐作者",
     "music_url": "音乐URL",
-    "downloads": "视频URL" | ["图片URL", ...]  // 视频时为字符串，图集/实况时为数组
+    "downloads": "视频URL" | ["图片URL", ...]
   }
 }
 ```
@@ -383,19 +384,19 @@ class VideoInfo {
 
 基于 `SharedPreferences` 的持久化键值存储，管理所有用户配置：
 
-| 键名 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `floating_window_enabled` | bool | false | 悬浮窗开关 |
-| `floating_compact_mode` | bool | false | 简洁模式开关 |
-| `compact_auto_close_delay` | int | 3 | 简洁面板自动关闭延迟（秒） |
-| `parse_mode` | String | 'self' | 解析模式：self / self_v2 / local |
-| `self_hosted_url` | String | '' | 自建接口地址 |
-| `self_hosted_token` | String | '' | 自建接口 Token |
-| `self_hosted_v2_url` | String | '' | 自建接口 V2 地址 |
-| `self_hosted_v2_token` | String | '' | 自建接口 V2 Token |
-| `douyin_cookie` | String | '' | 抖音 Cookie |
-| `album_name` | String | '便捷下载' | 相册名称 |
-| `group_by_author` | bool | false | 按发布者分组 |
+| 键名                      | 类型   | 默认值     | 说明                               |
+| :------------------------ | :----- | :--------- | :--------------------------------- |
+| `floating_window_enabled` | bool   | false      | 悬浮窗开关                         |
+| `floating_compact_mode`   | bool   | false      | 简洁模式开关                       |
+| `compact_auto_close_delay`| int    | 3          | 简洁面板自动关闭延迟（秒）         |
+| `parse_mode`              | String | 'self'     | 解析模式：self / self_v2 / local   |
+| `self_hosted_url`         | String | ''         | 自建接口地址                       |
+| `self_hosted_token`       | String | ''         | 自建接口 Token                     |
+| `self_hosted_v2_url`      | String | ''         | 自建接口 V2 地址                   |
+| `self_hosted_v2_token`    | String | ''         | 自建接口 V2 Token                  |
+| `douyin_cookie`           | String | ''         | 抖音 Cookie                        |
+| `album_name`              | String | '便捷下载' | 相册名称                           |
+| `group_by_author`         | bool   | false      | 按发布者分组                       |
 
 #### 8. 历史记录（`HistoryService`）
 
@@ -409,20 +410,20 @@ class VideoInfo {
 
 ## 🛠️ 技术栈
 
-| 技术 | 用途 |
-|------|------|
-| **Flutter 3.x** | 跨平台 UI 框架 |
-| **Dart 3.x** | 编程语言 |
-| **Material Design 3** | UI 设计规范 |
-| **Freezed** | 不可变数据模型代码生成 |
-| **Dio** | HTTP 网络请求，支持下载进度回调 |
-| **http** | 轻量 HTTP 请求（用于解析接口） |
-| **SharedPreferences** | 本地持久化键值存储 |
-| **MethodChannel** | Flutter ↔ Android 原生双向通信 |
-| **CachedNetworkImage** | 网络图片缓存加载 |
-| **FilePicker** | 文件选择器（Cookie 导入） |
-| **PermissionHandler** | 运行时权限管理 |
-| **DeviceInfoPlus** | 设备信息获取（Android SDK 版本判断） |
+| 技术                   | 用途                                     |
+| :--------------------- | :--------------------------------------- |
+| **Flutter 3.x**        | 跨平台 UI 框架                           |
+| **Dart 3.x**           | 编程语言                                 |
+| **Material Design 3**  | UI 设计规范                              |
+| **Freezed**            | 不可变数据模型代码生成                   |
+| **Dio**                | HTTP 网络请求，支持下载进度回调          |
+| **http**               | 轻量 HTTP 请求（用于解析接口）           |
+| **SharedPreferences**  | 本地持久化键值存储                       |
+| **MethodChannel**      | Flutter ↔ Android 原生双向通信          |
+| **CachedNetworkImage** | 网络图片缓存加载                         |
+| **FilePicker**         | 文件选择器（Cookie 导入）                |
+| **PermissionHandler**  | 运行时权限管理                           |
+| **DeviceInfoPlus**     | 设备信息获取（Android SDK 版本判断）     |
 
 ---
 
@@ -492,18 +493,18 @@ flutter build apk --release
 
 主要依赖列表（详见 `pubspec.yaml`）：
 
-| 包名 | 版本 | 用途 |
-|------|------|------|
-| `http` | ^1.1.0 | 轻量 HTTP 请求（解析接口调用） |
-| `dio` | ^5.4.0 | 高级 HTTP 客户端，支持下载进度 |
-| `shared_preferences` | ^2.2.2 | 本地键值存储 |
-| `path_provider` | ^2.1.1 | 系统路径获取 |
-| `permission_handler` | ^11.0.1 | 运行时权限 |
-| `device_info_plus` | ^9.1.0 | 设备信息获取 |
-| `cached_network_image` | ^3.3.1 | 网络图片缓存 |
-| `file_picker` | ^6.1.1 | 文件选择器 |
-| `freezed_annotation` | ^2.4.1 | 数据模型注解 |
-| `json_annotation` | ^4.8.1 | JSON 序列化注解 |
+| 包名                   | 版本    | 用途                              |
+| :--------------------- | :------ | :-------------------------------- |
+| `http`                 | ^1.1.0  | 轻量 HTTP 请求（解析接口调用）   |
+| `dio`                  | ^5.4.0  | 高级 HTTP 客户端，支持下载进度   |
+| `shared_preferences`   | ^2.2.2  | 本地键值存储                     |
+| `path_provider`        | ^2.1.1  | 系统路径获取                     |
+| `permission_handler`   | ^11.0.1 | 运行时权限                       |
+| `device_info_plus`     | ^9.1.0  | 设备信息获取                     |
+| `cached_network_image` | ^3.3.1  | 网络图片缓存                     |
+| `file_picker`          | ^6.1.1  | 文件选择器                       |
+| `freezed_annotation`   | ^2.4.1  | 数据模型注解                     |
+| `json_annotation`      | ^4.8.1  | JSON 序列化注解                  |
 
 ---
 
