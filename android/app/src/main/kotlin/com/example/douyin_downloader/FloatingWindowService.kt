@@ -28,11 +28,17 @@ import java.net.URL
 
 class FloatingWindowService : Service() {
 
+    companion object {
+        var instance: FloatingWindowService? = null
+            private set
+    }
+
     private lateinit var windowManager: WindowManager
     private lateinit var floatingView: View
     private var compactPanel: View? = null
     private var isCompactMode = false
     @Volatile private var isPanelActive = false
+    @Volatile private var isButtonHidden = false
     private val mainHandler = Handler(Looper.getMainLooper())
     
     // 进度更新节流：最多每300ms更新一次UI
@@ -57,7 +63,12 @@ class FloatingWindowService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        instance = this
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
+
+        // 检查悬浮按钮是否被隐藏
+        val prefs = getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
+        isButtonHidden = prefs.getBoolean("floating_button_hidden", false)
 
         // 使用哆啦A梦图标
         floatingView = ImageView(this).apply {
@@ -111,7 +122,10 @@ class FloatingWindowService : Service() {
             true
         }
 
-        windowManager.addView(floatingView, params)
+        // 如果悬浮按钮未被隐藏，才添加到窗口
+        if (!isButtonHidden) {
+            windowManager.addView(floatingView, params)
+        }
     }
 
     // ── 简洁面板 ──────────────────────────────────────────────
@@ -144,6 +158,10 @@ class FloatingWindowService : Service() {
         val tvDownloadProgress = panel.findViewById<TextView>(R.id.tv_download_progress)
 
         panel.findViewById<ImageButton>(R.id.btn_close).setOnClickListener { dismissCompactPanel() }
+        panel.findViewById<ImageButton>(R.id.btn_hide).setOnClickListener {
+            dismissCompactPanel()
+            hideFloatingButton()
+        }
 
         // 面板显示后延迟读剪贴板（等待窗口获得焦点）
         mainHandler.postDelayed({
@@ -600,6 +618,81 @@ class FloatingWindowService : Service() {
         }
     }
 
+    /** 隐藏悬浮按钮（从窗口移除，但 Service 继续运行） */
+    private fun hideFloatingButton() {
+        if (::floatingView.isInitialized) {
+            try { windowManager.removeView(floatingView) } catch (_: Exception) {}
+        }
+        // 保存隐藏状态，以便 Service 重启时也能记住
+        val prefs = getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
+        prefs.edit().putBoolean("floating_button_hidden", true).apply()
+    }
+
+    /** 恢复显示悬浮按钮 */
+    fun showFloatingButton() {
+        val prefs = getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
+        prefs.edit().putBoolean("floating_button_hidden", false).apply()
+        if (::floatingView.isInitialized) {
+            try {
+                // 如果已经在窗口中，先移除再添加
+                try { windowManager.removeView(floatingView) } catch (_: Exception) {}
+            } catch (_: Exception) {}
+
+            val params = WindowManager.LayoutParams(
+                140, 140,
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSLUCENT
+            ).apply {
+                gravity = Gravity.TOP or Gravity.START
+                x = 20; y = 300
+            }
+
+            // 重新设置触摸监听
+            var initialX = 0; var initialY = 0
+            var initialTouchX = 0f; var initialTouchY = 0f
+            var moved = false
+
+            floatingView.setOnTouchListener { _, event ->
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        moved = false
+                        initialX = params.x; initialY = params.y
+                        initialTouchX = event.rawX; initialTouchY = event.rawY
+                    }
+                    MotionEvent.ACTION_MOVE -> {
+                        val dx = (event.rawX - initialTouchX).toInt()
+                        val dy = (event.rawY - initialTouchY).toInt()
+                        if (Math.abs(dx) > 8 || Math.abs(dy) > 8) moved = true
+                        params.x = initialX + dx; params.y = initialY + dy
+                        windowManager.updateViewLayout(floatingView, params)
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        if (!moved) {
+                            if (isCompactMode) {
+                                showCompactPanel(null)
+                            } else {
+                                startActivity(Intent(this, MainActivity::class.java).apply {
+                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                                    putExtra("read_clipboard", true)
+                                })
+                            }
+                        }
+                    }
+                }
+                true
+            }
+
+            windowManager.addView(floatingView, params)
+        }
+    }
+
+    /** 检查悬浮按钮是否被隐藏 */
+    fun isFloatingButtonHidden(): Boolean {
+        val prefs = getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
+        return prefs.getBoolean("floating_button_hidden", false)
+    }
+
     private fun dismissCompactPanel() {
         isPanelActive = false
         val panel = compactPanel ?: return
@@ -609,6 +702,7 @@ class FloatingWindowService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        if (instance == this) instance = null
         dismissCompactPanel()
         if (::floatingView.isInitialized) {
             try { windowManager.removeView(floatingView) } catch (_: Exception) {}

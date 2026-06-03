@@ -100,6 +100,13 @@ class MainActivity : FlutterActivity() {
                 "compactDownloadDone" -> {
                     result.success(null)
                 }
+                "showFloatingButton" -> {
+                    FloatingWindowService.instance?.showFloatingButton()
+                    result.success(null)
+                }
+                "isFloatingButtonHidden" -> {
+                    result.success(FloatingWindowService.instance?.isFloatingButtonHidden() ?: false)
+                }
                 else -> result.notImplemented()
             }
         }

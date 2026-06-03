@@ -25,6 +25,14 @@ class FloatingWindowService {
     await _channel.invokeMethod('stopFloatingWindow');
   }
 
+  static Future<void> showFloatingButton() async {
+    await _channel.invokeMethod('showFloatingButton');
+  }
+
+  static Future<bool> isFloatingButtonHidden() async {
+    return await _channel.invokeMethod<bool>('isFloatingButtonHidden') ?? false;
+  }
+
   static Future<void> saveFileToGallery(String filePath, String fileName, String albumName) async {
     await _channel.invokeMethod('saveFileToGallery', {
       'filePath': filePath,

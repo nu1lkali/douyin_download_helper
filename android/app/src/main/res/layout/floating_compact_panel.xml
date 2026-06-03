@@ -25,6 +25,15 @@
             android:textColor="#1677FF" />
 
         <ImageButton
+            android:id="@+id/btn_hide"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@android:drawable/ic_menu_view"
+            android:background="@android:color/transparent"
+            android:tint="#999999"
+            android:contentDescription="隐藏悬浮按钮" />
+
+        <ImageButton
             android:id="@+id/btn_close"
             android:layout_width="32dp"
             android:layout_height="32dp"

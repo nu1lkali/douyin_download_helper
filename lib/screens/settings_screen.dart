@@ -16,6 +16,7 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
   bool _floatingEnabled = false;
   bool _hasOverlayPermission = false;
   bool _floatingCompact = false;
+  bool _floatingButtonHidden = false;
   final _albumController = TextEditingController();
   final _cookieController = TextEditingController();
   ParseMode _parseMode = ParseMode.selfHosted;
@@ -40,7 +41,17 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) _checkPermission();
+    if (state == AppLifecycleState.resumed) {
+      _checkPermission();
+      _refreshHiddenState();
+    }
+  }
+
+  Future<void> _refreshHiddenState() async {
+    final buttonHidden = await FloatingWindowService.isFloatingButtonHidden();
+    if (mounted && buttonHidden != _floatingButtonHidden) {
+      setState(() => _floatingButtonHidden = buttonHidden);
+    }
   }
 
   Future<void> _load() async {
@@ -50,12 +61,14 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
     final cookie = await SettingsService.getCookie();
     final compact = await SettingsService.getFloatingCompactMode();
     await _checkPermission();
+    final buttonHidden = await FloatingWindowService.isFloatingButtonHidden();
     setState(() {
       _floatingEnabled = enabled;
       _albumController.text = albumName;
       _parseMode = mode;
       _cookieController.text = cookie;
       _floatingCompact = compact;
+      _floatingButtonHidden = buttonHidden;
     });
   }
 
@@ -382,6 +395,25 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
               ),
               const Divider(height: 1, indent: 16, endIndent: 16),
               _CompactAutoCloseSwitch(primary: _primary),
+              if (_floatingEnabled && _floatingButtonHidden) ...[
+                const Divider(height: 1, indent: 16, endIndent: 16),
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  leading: const Icon(Icons.visibility_rounded, color: Colors.blue, size: 20),
+                  title: const Text('恢复悬浮按钮',
+                    style: TextStyle(fontSize: 14, color: Colors.blue, fontWeight: FontWeight.w500)),
+                  subtitle: Text(
+                    '悬浮按钮已隐藏，点击恢复显示',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                  ),
+                  trailing: const Icon(Icons.chevron_right, color: Colors.blue, size: 20),
+                  onTap: () async {
+                    await FloatingWindowService.showFloatingButton();
+                    setState(() => _floatingButtonHidden = false);
+                    _showSnack('悬浮按钮已恢复显示');
+                  },
+                ),
+              ],
               if (!_hasOverlayPermission) ...[
                 const Divider(height: 1, indent: 16, endIndent: 16),
                 ListTile(
