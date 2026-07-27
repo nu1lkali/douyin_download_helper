@@ -12,21 +12,35 @@ class SelfHostedV2ApiService {
     final url = await SettingsService.getSelfHostedV2Url();
     final token = await SettingsService.getSelfHostedV2Token();
     if (url.isEmpty) throw Exception('请先在设置中配置自建接口 V2 地址');
-   
-    final base = url.replaceAll(RegExp(r'/+$'), '');
+    
     final cookie = await SettingsService.getCookie();
 
-    await LogService.log('SelfHostedV2', 'parse: $inputText');
+    await LogService.log('SelfHostedV2', 'parse raw input: $inputText');
 
-    final uri = Uri.parse('$base/api/hybrid/video_data').replace(
-      queryParameters: {'url': inputText},
+    // 1. 从输入文本中正则提取真正的 http/https 链接（防止传入带有空格、中文或换行符的口令导致 400）
+    final regExp = RegExp(r'https?://[^\s]+');
+    final match = regExp.firstMatch(inputText);
+    final cleanUrl = match != null ? match.group(0)! : inputText.trim();
+
+    // 2. 规范化构建 URI，Dart 会自动对 queryParameters 进行安全的 URL 编码
+    final parsedBase = Uri.parse(url.trim());
+    final basePath = parsedBase.path.replaceAll(RegExp(r'/+$'), '');
+    final uri = parsedBase.replace(
+      path: '$basePath/api/hybrid/video_data',
+      queryParameters: {'url': cleanUrl},
     );
+
+    await LogService.log('SelfHostedV2', 'request uri: ${uri.toString()}');
+
+    // 3. 清理 Token 和 Cookie 中的换行符与多余空格（非法字符会导致 Header 解析抛出 400）
+    final cleanToken = token.replaceAll(RegExp(r'[\r\n]'), '').trim();
+    final cleanCookie = cookie.replaceAll(RegExp(r'[\r\n]'), '').trim();
 
     http.Response resp;
     try {
       resp = await http.get(uri, headers: {
-        if (token.isNotEmpty) 'token': token,
-        if (cookie.isNotEmpty) 'Cookie': cookie,
+        if (cleanToken.isNotEmpty) 'token': cleanToken,
+        if (cleanCookie.isNotEmpty) 'Cookie': cleanCookie,
       }).timeout(const Duration(seconds: 60));
     } catch (e, s) {
       await LogService.logError('SelfHostedV2', e, s);

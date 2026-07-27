@@ -7,7 +7,8 @@ import java.net.URL
 object SelfHostedV2Parser {
 
     fun parse(text: String, base: String, token: String, cookie: String): DouyinParser.ParseResult {
-        val encodedUrl = java.net.URLEncoder.encode(text, "UTF-8")
+        val cleanUrl = extractUrl(text)
+        val encodedUrl = java.net.URLEncoder.encode(cleanUrl, "UTF-8")
         val fullUrl = "$base/api/hybrid/video_data?url=$encodedUrl"
         val resp = getJson(fullUrl, token, cookie)
         val root = JSONObject(resp)
@@ -18,6 +19,40 @@ object SelfHostedV2Parser {
 
         val item = root.getJSONObject("data")
         return parseItem(item)
+    }
+
+    /**
+     * 从原始分享文本中提取真实 URL（防止中文口令、空格、换行符等导致 400）
+     * 优先级：v.douyin.com 短链 → www.douyin.com/video/ → 任意 https?:// 链接 → 原文 trim
+     */
+    private fun extractUrl(text: String): String {
+        // 1. 优先匹配抖音短链 https://v.douyin.com/xxx/
+        val shortUrlRegex = Regex("""https://v\.douyin\.com/[\w\-/]+""")
+        val shortMatch = shortUrlRegex.find(text)
+        if (shortMatch != null) {
+            return shortMatch.value.replace(Regex("""[^\w\-/:.]"""), "")
+        }
+
+        // 2. 匹配正常视频页 https://www.douyin.com/video/数字ID
+        val normalVideoRegex = Regex("""https://(?:www\.)?douyin\.com/video/\d+""")
+        val normalMatch = normalVideoRegex.find(text)
+        if (normalMatch != null) return normalMatch.value
+
+        // 3. 发现页 / 用户主页含 modal_id
+        val modalIdRegex = Regex("""https://(?:www\.)?douyin\.com/[^\s]*[?&]modal_id=(\d+)""")
+        val modalMatch = modalIdRegex.find(text)
+        if (modalMatch != null) return "https://www.douyin.com/video/${modalMatch.groupValues[1]}"
+
+        // 4. 通用：提取第一个 https?:// 链接
+        val genericRegex = Regex("""https?://[^\s]+""")
+        val genericMatch = genericRegex.find(text)
+        if (genericMatch != null) {
+            // 去掉末尾可能附着的非 URL 字符（中文标点、右括号等）
+            return genericMatch.value.replace(Regex("""[^\w\-/:.?=&%#+]"""), "")
+        }
+
+        // 5. 兜底
+        return text.trim()
     }
 
     private fun parseItem(item: JSONObject): DouyinParser.ParseResult {
